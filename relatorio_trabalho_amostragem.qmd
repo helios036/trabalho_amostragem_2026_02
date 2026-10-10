@@ -196,11 +196,17 @@ Dos 401 respondentes válidos, o perfil demográfico foi:
 
 A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã — isso deve ser mencionado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
 
+![Distribuição por Faixa Etária](imagens/distribuicao_por_faixa_etaria.png){width=80%}
+
+![Distribuição por Turno de Coleta](imagens/distribuicao_turno_coleta.png){width=80%}
+
 ## 4.2 Não-resposta
 
 - Taxa de não-resposta - Presidente: **13,47%** (54 de 401)
 - Taxa de não-resposta - Governador: **13,47%** (54 de 401) — os mesmos 54 respondentes não responderam a nenhuma das duas perguntas, sugerindo recusa geral em participar, e não dúvida específica sobre um cargo.
 - Não-resposta diferencial por sexo: mulheres tiveram taxa de não-resposta de **15,90%**, contra **11,39%** dos homens. A diferença é pequena, mas consistente nas duas perguntas — pode ser mencionada como um indício (não conclusivo) de viés leve de não-resposta por sexo.
+
+![Não-resposta por Sexo - Presidente](imagens/taxa_resposta_presidente_por_genero.png){width=55%}
 
 ## 4.3 Estimativas pontuais, erro-padrão e IC 95% (PROC SURVEYFREQ, n válido = 347)
 
@@ -261,6 +267,10 @@ Os testes qui-quadrado de associação entre o candidato escolhido e cada variá
 
 - **Turno:** o teste qui-quadrado sugere uma diferença estatisticamente significativa na intenção de voto entre os turnos (p=0,0389 para Presidente; p=0,0350 para Governador). Olhando os gráficos de barras empilhadas, a maior diferença aparece no turno da Noite, com uma participação bem maior de "Branco/Flávio Bolsonaro" em Presidente e mais "Não sei/Não quero responder" proporcionalmente menor. **Importante:** o próprio SAS alerta que mais de 2/3 das células têm contagem esperada menor que 5 (reflexo do turno Noite ter apenas 20 respondentes e dos candidatos minoritários terem poucas respostas) — isso torna o teste qui-quadrado estatisticamente pouco confiável nesse cruzamento, e deve ser mencionado como limitação ao relatar esse resultado, não como conclusão definitiva.
 - **Faixa etária** e **Faixa de renda:** ambos os cruzamentos são fortemente significativos (p<0,0001), mas sofrem do mesmo problema de esparsidade (84%–88% das células com contagem esperada <5), dado o grande número de categorias de candidatos combinado com faixas pouco povoadas (ex: 35 a 39 anos tem apenas 5 respondentes no total). A leitura qualitativa dos gráficos é mais confiável que o p-valor nesse caso.
+
+![Presidente por Turno (% dentro de cada turno)](imagens/presidente_por_turno_aula.png){width=80%}
+
+![Governador por Turno (% dentro de cada turno)](imagens/governador_por_turno.png){width=80%}
 
 # 5. Conclusões
 
