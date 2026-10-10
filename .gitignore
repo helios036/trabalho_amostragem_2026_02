@@ -1,0 +1,27 @@
+# Material de apoio pessoal / referencia - nao entregavel
+Bolfarine-Amostragem.pdf
+Cochran_1977_Sampling_Techniques_Third_E.pdf
+orientacoes_trabalho.aac
+transcricao_da_orienta_o_de_amostragem.txt
+trabalho_amostragem.docx
+~$*.docx
+
+# Outputs/prints usados so para diagnostico, nao fazem parte do trabalho
+outputs_sas.pdf
+print_tela_sas.png
+
+# Rascunho em markdown substituido pelo .qmd (fonte oficial do relatorio)
+relatorio_trabalho_amostragem.md
+
+# Lixo comum de SO / editores
+Thumbs.db
+.DS_Store
+*.~lock*
+
+# Artefatos de build do Quarto/LaTeX
+/.quarto/
+*_files/
+*.tex
+*.log
+*.aux
+*.out
