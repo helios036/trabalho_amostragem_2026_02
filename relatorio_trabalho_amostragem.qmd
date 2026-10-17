@@ -151,6 +151,36 @@ A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por
 
 ![Local de coleta — pavilhão na UnB](imagens/imagens_coleta/local_coleta_unb.jpeg){width=70%}
 
+```{=latex}
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth,height=6.5cm,keepaspectratio]{imagens/imagens_coleta/coleta_1.jpeg}\\[2pt]
+{\small Abordagem aos entrevistados --- turno diurno, área interna do pavilhão}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth,height=6.5cm,keepaspectratio]{imagens/imagens_coleta/coleta_2.jpeg}\\[2pt]
+{\small Abordagem aos entrevistados --- turno diurno, área externa do pavilhão}
+\end{minipage}
+
+\vspace{0.4cm}
+
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth,height=6.5cm,keepaspectratio]{imagens/imagens_coleta/coleta_3.jpeg}\\[2pt]
+{\small Abordagem aos entrevistados --- turno noturno}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth,height=6.5cm,keepaspectratio]{imagens/imagens_coleta/coleta_4.jpeg}\\[2pt]
+{\small Abordagem aos entrevistados --- turno noturno}
+\end{minipage}
+\end{center}
+```
+
 A coleta foi dividida em três turnos (Manhã, Tarde e Noite), cada um conduzido por um membro/subgrupo da equipe. Antes da análise, foram descartadas 18 linhas totalmente vazias ao final da planilha (artefato da ferramenta de coleta), restando 400 registros válidos. Também foi identificada uma inconsistência de digitação na base: a resposta "Samara Martins (11)" aparecia sob duas grafias (uma com espaço em branco inicial), o que a fazia contar como duas categorias distintas nas tabelas de frequência. Essa inconsistência foi corrigida com `strip()` nas colunas de candidato:
 
 ```sas
