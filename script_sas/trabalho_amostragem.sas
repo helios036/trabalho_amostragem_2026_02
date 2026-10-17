@@ -47,7 +47,7 @@ options validvarname=any;   /* permite nomes de coluna com espaço/acento no imp
    (Home) no SAS Studio — mesmo tipo de ajuste já feito no datafile= da
    PROC IMPORT (o SAS Studio roda num servidor Linux, não no seu PC).
    ------------------------------------------------------------------------- */
-%let outpath = /home/SEU_USUARIO/imagens;   /* <-- AJUSTE AQUI */
+%let outpath = /home/helios_0190/imagens;
 
 ods listing gpath="&outpath." image_dpi=200;
 ods graphics on / width=800px height=500px imagefmt=png reset=all;
@@ -56,7 +56,7 @@ ods graphics on / width=800px height=500px imagefmt=png reset=all;
    1. IMPORTAÇÃO DA AMOSTRA
    ------------------------------------------------------------------------- */
 proc import out=amostra_raw
-    datafile="C:\modelos_ia_gen\trabalho_amostragem\intenções_de_voto_pavilhões.xlsx"
+    datafile="/home/helios_0190/intenções_de_voto_pavilhões.xlsx"
     dbms=xlsx replace;
     getnames=yes;
 run;
@@ -288,20 +288,25 @@ run;
 /* -------------------------------------------------------------------------
    5. MARGEM DE ERRO: NOMINAL (n=400) x EFETIVA (descontando não-resposta)
       Como a população é desconhecida/grande, não há correção de população
-      finita (fpc). Cenário de pior caso (p=0,5) para a margem de erro:
+      finita (fpc). Cenário de pior caso (p=0,5) para a margem de erro,
+      usando o percentil t (TINV, df=n-1) em vez de Z fixo - mesma
+      convenção adotada pelo professor em todas as aulas (aula3/4/5.sas):
 
-           e = Z * sqrt( p*(1-p) / n )
+           e = t(0,975; n-1) * sqrt( p*(1-p) / n )
 
       A não-resposta reduz o n efetivo de cada pergunta, o que AUMENTA
       a margem de erro em relação ao n nominal da amostra coletada.
    ------------------------------------------------------------------------- */
 data _null_;
-    Z = 1.96;      /* 95% de confiança */
     p = 0.5;       /* cenário de variância máxima */
 
-    e_nominal = Z * sqrt( p*(1-p) / &n_nominal. );
-    e_pres    = Z * sqrt( p*(1-p) / &n_valid_pres. );
-    e_gov     = Z * sqrt( p*(1-p) / &n_valid_gov. );
+    t_nominal = tinv(0.975, &n_nominal. - 1);
+    t_pres    = tinv(0.975, &n_valid_pres. - 1);
+    t_gov     = tinv(0.975, &n_valid_gov. - 1);
+
+    e_nominal = t_nominal * sqrt( p*(1-p) / &n_nominal. );
+    e_pres    = t_pres    * sqrt( p*(1-p) / &n_valid_pres. );
+    e_gov     = t_gov     * sqrt( p*(1-p) / &n_valid_gov. );
 
     put "Margem de erro c/ n nominal (&n_nominal.): " e_nominal best6.;
     put "Margem de erro efetiva - Presidente (n=&n_valid_pres.): " e_pres best6.;
@@ -310,9 +315,12 @@ run;
 
 /* -------------------------------------------------------------------------
    6. VARIÂNCIA DAS ESTIMATIVAS (cálculo explícito pela fórmula)
-      Para cada candidato: p_hat = count/n ; Var(p_hat) = p_hat*(1-p_hat)/n
-      (população infinita, sem fpc). Serve para conferir "na mão" os
-      desvios-padrão/IC que o PROC SURVEYFREQ calcula na seção 7.
+      Para cada candidato: p_hat = count/n ; Var(p_hat) = p_hat*(1-p_hat)/(n-1)
+      (estimador não-viesado de Cochran, população infinita/sem fpc - ver
+      Seção 2.2 do relatório). O IC usa o percentil t (TINV, df=n-1), não
+      Z fixo - mesma convenção do professor em aula3/4/5.sas. Serve para
+      conferir "na mão" os desvios-padrão/IC que o PROC SURVEYFREQ calcula
+      na seção 7.
    ------------------------------------------------------------------------- */
 proc freq data=amostra noprint;
     tables presidente / out=freq_pres (where=(not missing(presidente)));
@@ -323,20 +331,22 @@ data var_pres;
     set freq_pres;
     n      = &n_valid_pres.;
     p_hat  = count / n;
-    var_p  = p_hat*(1-p_hat) / n;
+    var_p  = p_hat*(1-p_hat) / (n-1);
     se_p   = sqrt(var_p);
-    ic_li  = max(0, p_hat - 1.96*se_p);
-    ic_ls  = min(1, p_hat + 1.96*se_p);
+    tcrit  = tinv(0.975, n-1);
+    ic_li  = max(0, p_hat - tcrit*se_p);
+    ic_ls  = min(1, p_hat + tcrit*se_p);
 run;
 
 data var_gov;
     set freq_gov;
     n      = &n_valid_gov.;
     p_hat  = count / n;
-    var_p  = p_hat*(1-p_hat) / n;
+    var_p  = p_hat*(1-p_hat) / (n-1);
     se_p   = sqrt(var_p);
-    ic_li  = max(0, p_hat - 1.96*se_p);
-    ic_ls  = min(1, p_hat + 1.96*se_p);
+    tcrit  = tinv(0.975, n-1);
+    ic_li  = max(0, p_hat - tcrit*se_p);
+    ic_ls  = min(1, p_hat + tcrit*se_p);
 run;
 
 title "Variância e IC calculados manualmente - Presidente";
@@ -350,45 +360,164 @@ proc print data=var_gov noobs;
 run;
 title;
 
-/* Converte para percentual (mais legível no gráfico) */
-data var_pres_pct;
-    set var_pres;
+/* -------------------------------------------------------------------------
+   6.5 GRUPO "OUTROS" (candidatos com menos de 1% dos votos válidos)
+       Consolida, em cada cargo, todo candidato cuja contagem represente
+       menos de 1% de n_valido - isso inclui Romeu Zema (8), que tem cor
+       própria definida na paleta (seção 6.7) mas apenas 1 voto (0,26%):
+       por decisão explícita, o critério de 1% é aplicado sem exceção.
+       Branco, Nulo, "Sem resposta" e "Não sei/não quero responder" NUNCA
+       entram em "Outros" (não são candidatos) - na prática, de toda
+       forma, todos ficam acima de 1% nos dois cargos. O formato é
+       construído via lookup em hash object a partir das contagens já
+       calculadas em freq_pres/freq_gov (seção 6), então se recalcula
+       sozinho a cada nova rodada (se os votos mudarem, quem entra em
+       "Outros" também pode mudar). Esse agrupamento vale só para os
+       GRÁFICOS (seções 7 e 8.3) - as tabelas (PROC SURVEYFREQ, PROC
+       PRINT) continuam com o detalhamento candidato a candidato.
+       (OBS: a primeira versão usava PROC FORMAT/CNTLIN, mas o hash
+       object evita qualquer ambiguidade de nome/formato na aplicação.)
+   ------------------------------------------------------------------------- */
+data amostra;
+    set amostra;
+    length presidente_grp governador_grp $40;   /* evita truncar p/ 6 chars ('Outros') */
+    if _n_ = 1 then do;
+        declare hash hpres(dataset: 'freq_pres(rename=(count=count_pres))');
+        hpres.defineKey('presidente');
+        hpres.defineData('count_pres');
+        hpres.defineDone();
+        declare hash hgov(dataset: 'freq_gov(rename=(count=count_gov))');
+        hgov.defineKey('governador');
+        hgov.defineData('count_gov');
+        hgov.defineDone();
+        call missing(count_pres, count_gov);
+    end;
+
+    if hpres.find() = 0
+       and (count_pres / &n_valid_pres.) < 0.01
+       and presidente not in ('Branco (13)', 'Nulo (14)',
+             'Não sei/não quero responder (15)', 'Sem resposta')
+        then presidente_grp = 'Outros';
+        else presidente_grp = presidente;
+
+    if hgov.find() = 0
+       and (count_gov / &n_valid_gov.) < 0.01
+       and governador not in ('Branco (11)', 'Nulo (12)',
+             'Não sei / Não quero responder (13)', 'Sem resposta')
+        then governador_grp = 'Outros';
+        else governador_grp = governador;
+
+    drop count_pres count_gov;
+run;
+
+/* -------------------------------------------------------------------------
+   6.6 VARIÂNCIA DO GRUPO (para o gráfico de IC da seção 7, já com
+       candidatos minoritários consolidados em "Outros") - mesma fórmula
+       e critério da seção 6, agora sobre presidente_grp/governador_grp.
+   ------------------------------------------------------------------------- */
+proc freq data=amostra noprint;
+    tables presidente_grp / out=freq_pres_grp (where=(not missing(presidente_grp)));
+    tables governador_grp / out=freq_gov_grp  (where=(not missing(governador_grp)));
+run;
+
+data var_pres_grp;
+    set freq_pres_grp;
+    n      = &n_valid_pres.;
+    p_hat  = count / n;
+    var_p  = p_hat*(1-p_hat) / (n-1);
+    se_p   = sqrt(var_p);
+    tcrit  = tinv(0.975, n-1);
+    ic_li  = max(0, p_hat - tcrit*se_p);
+    ic_ls  = min(1, p_hat + tcrit*se_p);
     pct    = p_hat*100;
     li_pct = ic_li*100;
     ls_pct = ic_ls*100;
 run;
 
-data var_gov_pct;
-    set var_gov;
+data var_gov_grp;
+    set freq_gov_grp;
+    n      = &n_valid_gov.;
+    p_hat  = count / n;
+    var_p  = p_hat*(1-p_hat) / (n-1);
+    se_p   = sqrt(var_p);
+    tcrit  = tinv(0.975, n-1);
+    ic_li  = max(0, p_hat - tcrit*se_p);
+    ic_ls  = min(1, p_hat + tcrit*se_p);
     pct    = p_hat*100;
     li_pct = ic_li*100;
     ls_pct = ic_ls*100;
 run;
 
 /* -------------------------------------------------------------------------
-   6.5 PALETA DE CORES DOS CANDIDATOS
-       Mapa de atributos (ATTRMAP) para fixar a mesma cor a cada candidato
-       em todos os gráficos, independentemente da ordem das barras.
-       ID "candpres" = Presidente | ID "candgov" = Governador.
-       Candidatos sem cor definida pelo usuário ficam com as cores padrão
-       do SAS (ex.: Branco, Nulo, Não sei/não quero responder, Sem resposta).
+   6.7 PALETA DE CORES E ORDEM DA LEGENDA
+       ATTRMAP fixa a cor de cada candidato/categoria (ID "candpres" =
+       Presidente | ID "candgov" = Governador). Situações de não-voto
+       (Branco, Nulo, Sem resposta, Não sei/não quero responder) recebem
+       tons de cinza, para ficarem visualmente separadas dos candidatos
+       na legenda. "Outros" recebe uma cor neutra própria. Os formatos
+       $presgrpord/$govgrpord fixam a ORDEM da legenda nos gráficos
+       empilhados (seção 8.3): primeiro as situações de não-voto, depois
+       os candidatos nomeados (ordem decrescente de votos), e "Outros"
+       por último.
    ------------------------------------------------------------------------- */
 data attrmap;
     length ID $10 VALUE $60 FILLCOLOR LINECOLOR MARKERCOLOR $20;
 
+    /* situações de não-voto - tons de cinza */
+    ID='candpres'; VALUE='Branco (13)';                     FILLCOLOR='cxBFBFBF'; LINECOLOR='cxBFBFBF'; MARKERCOLOR='cxBFBFBF'; output;
+    ID='candpres'; VALUE='Nulo (14)';                        FILLCOLOR='cx808080'; LINECOLOR='cx808080'; MARKERCOLOR='cx808080'; output;
+    ID='candpres'; VALUE='Sem resposta';                     FILLCOLOR='cx595959'; LINECOLOR='cx595959'; MARKERCOLOR='cx595959'; output;
+    ID='candpres'; VALUE='Não sei/não quero responder (15)'; FILLCOLOR='cx404040'; LINECOLOR='cx404040'; MARKERCOLOR='cx404040'; output;
+
+    /* candidatos nomeados */
     ID='candpres'; VALUE='Luiz Inácio Lula da Silva (5)'; FILLCOLOR='red';    LINECOLOR='red';    MARKERCOLOR='red';    output;
     ID='candpres'; VALUE='Flavio Bolsonaro (3)';           FILLCOLOR='blue';   LINECOLOR='blue';   MARKERCOLOR='blue';   output;
     ID='candpres'; VALUE='Augusto Cury (0)';               FILLCOLOR='green';  LINECOLOR='green';  MARKERCOLOR='green';  output;
     ID='candpres'; VALUE='Renan Santos (7)';               FILLCOLOR='gold';   LINECOLOR='gold';   MARKERCOLOR='gold';   output;
-    ID='candpres'; VALUE='Romeu Zema (8)';                 FILLCOLOR='orange'; LINECOLOR='orange'; MARKERCOLOR='orange'; output;
     ID='candpres'; VALUE='Ronaldo Caiado (9)';             FILLCOLOR='purple'; LINECOLOR='purple'; MARKERCOLOR='purple'; output;
     ID='candpres'; VALUE='Samara Martins (11)';            FILLCOLOR='brown';  LINECOLOR='brown';  MARKERCOLOR='brown';  output;
+
+    /* grupo residual (inclui Romeu Zema) */
+    ID='candpres'; VALUE='Outros';                         FILLCOLOR='tan';    LINECOLOR='tan';    MARKERCOLOR='tan';    output;
+
+    ID='candgov';  VALUE='Branco (11)';                       FILLCOLOR='cxBFBFBF'; LINECOLOR='cxBFBFBF'; MARKERCOLOR='cxBFBFBF'; output;
+    ID='candgov';  VALUE='Nulo (12)';                          FILLCOLOR='cx808080'; LINECOLOR='cx808080'; MARKERCOLOR='cx808080'; output;
+    ID='candgov';  VALUE='Sem resposta';                       FILLCOLOR='cx595959'; LINECOLOR='cx595959'; MARKERCOLOR='cx595959'; output;
+    ID='candgov';  VALUE='Não sei / Não quero responder (13)'; FILLCOLOR='cx404040'; LINECOLOR='cx404040'; MARKERCOLOR='cx404040'; output;
 
     ID='candgov';  VALUE='Leandro Grass (5)';              FILLCOLOR='red';    LINECOLOR='red';    MARKERCOLOR='red';    output;
     ID='candgov';  VALUE='Celina Leão (0)';                FILLCOLOR='gold';   LINECOLOR='gold';   MARKERCOLOR='gold';   output;
     ID='candgov';  VALUE='Paula Belmonte (6)';             FILLCOLOR='blue';   LINECOLOR='blue';   MARKERCOLOR='blue';   output;
     ID='candgov';  VALUE='Kiko Caputo (4)';                FILLCOLOR='orange'; LINECOLOR='orange'; MARKERCOLOR='orange'; output;
     ID='candgov';  VALUE='Ricardo Cappelli (9)';           FILLCOLOR='green';  LINECOLOR='green';  MARKERCOLOR='green';  output;
+
+    ID='candgov';  VALUE='Outros';                         FILLCOLOR='tan';    LINECOLOR='tan';    MARKERCOLOR='tan';    output;
+run;
+
+proc format;
+    value $presgrpord
+        'Branco (13)'                     = '01'
+        'Nulo (14)'                        = '02'
+        'Sem resposta'                     = '03'
+        'Não sei/não quero responder (15)' = '04'
+        'Luiz Inácio Lula da Silva (5)'    = '05'
+        'Renan Santos (7)'                 = '06'
+        'Flavio Bolsonaro (3)'             = '07'
+        'Ronaldo Caiado (9)'               = '08'
+        'Augusto Cury (0)'                 = '09'
+        'Samara Martins (11)'              = '10'
+        'Outros'                           = '11';
+    value $govgrpord
+        'Branco (11)'                       = '01'
+        'Nulo (12)'                          = '02'
+        'Sem resposta'                       = '03'
+        'Não sei / Não quero responder (13)' = '04'
+        'Leandro Grass (5)'                  = '05'
+        'Celina Leão (0)'                    = '06'
+        'Ricardo Cappelli (9)'               = '07'
+        'Kiko Caputo (4)'                    = '08'
+        'Paula Belmonte (6)'                 = '09'
+        'Outros'                             = '10';
 run;
 
 /* -------------------------------------------------------------------------
@@ -416,10 +545,11 @@ title;
 
 ods graphics / imagename="voto_presidente_ic";
 title "Intenção de voto - Presidente (%) com IC 95%";
-proc sgplot data=var_pres_pct dattrmap=attrmap;
-    hbar presidente / response=pct categoryorder=respdesc datalabel
-         group=presidente attrid=candpres noautolegend;
-    scatter x=pct y=presidente / xerrorlower=li_pct xerrorupper=ls_pct
+title2 "Candidatos com menos de 1% dos votos agrupados em 'Outros'";
+proc sgplot data=var_pres_grp_pct dattrmap=attrmap;
+    hbar presidente_grp / response=pct categoryorder=respdesc datalabel
+         group=presidente_grp attrid=candpres noautolegend;
+    scatter x=pct y=presidente_grp / xerrorlower=li_pct xerrorupper=ls_pct
             markerattrs=(symbol=none) lineattrs=(color=black thickness=2);
     xaxis label="Percentual (%)" grid;
     yaxis label="Candidato";
@@ -428,10 +558,11 @@ title;
 
 ods graphics / imagename="voto_governador_ic";
 title "Intenção de voto - Governador (%) com IC 95%";
-proc sgplot data=var_gov_pct dattrmap=attrmap;
-    hbar governador / response=pct categoryorder=respdesc datalabel
-         group=governador attrid=candgov noautolegend;
-    scatter x=pct y=governador / xerrorlower=li_pct xerrorupper=ls_pct
+title2 "Candidatos com menos de 1% dos votos agrupados em 'Outros'";
+proc sgplot data=var_gov_grp_pct dattrmap=attrmap;
+    hbar governador_grp / response=pct categoryorder=respdesc datalabel
+         group=governador_grp attrid=candgov noautolegend;
+    scatter x=pct y=governador_grp / xerrorlower=li_pct xerrorupper=ls_pct
             markerattrs=(symbol=none) lineattrs=(color=black thickness=2);
     xaxis label="Percentual (%)" grid;
     yaxis label="Candidato";
@@ -494,70 +625,98 @@ title;
        (barras empilhadas a 100%, usando o percentual de linha PCT_ROW)
    ------------------------------------------------------------------------- */
 proc freq data=amostra noprint;
-    tables renda_ord*presidente  / out=renda_pres  outpct;
-    tables etaria_ord*presidente / out=idade_pres   outpct;
-    tables turno_ord*presidente  / out=turno_pres   outpct;
-    tables renda_ord*governador  / out=renda_gov    outpct;
-    tables etaria_ord*governador / out=idade_gov    outpct;
-    tables turno_ord*governador  / out=turno_gov     outpct;
+    tables renda_ord*presidente_grp  / out=renda_pres  outpct;
+    tables etaria_ord*presidente_grp / out=idade_pres   outpct;
+    tables turno_ord*presidente_grp  / out=turno_pres   outpct;
+    tables renda_ord*governador_grp  / out=renda_gov    outpct;
+    tables etaria_ord*governador_grp / out=idade_gov    outpct;
+    tables turno_ord*governador_grp  / out=turno_gov     outpct;
 run;
+
+/* ordena os datasets para a legenda/empilhamento seguirem a ordem fixada
+   em $presgrpord/$govgrpord (seção 6.7): não-voto -> candidatos -> Outros */
+data renda_pres; set renda_pres; grp_ord = put(presidente_grp, $presgrpord.); run;
+data idade_pres; set idade_pres; grp_ord = put(presidente_grp, $presgrpord.); run;
+data turno_pres; set turno_pres; grp_ord = put(presidente_grp, $presgrpord.); run;
+data renda_gov;  set renda_gov;  grp_ord = put(governador_grp, $govgrpord.);  run;
+data idade_gov;  set idade_gov;  grp_ord = put(governador_grp, $govgrpord.);  run;
+data turno_gov;  set turno_gov;  grp_ord = put(governador_grp, $govgrpord.);  run;
+
+proc sort data=renda_pres; by grp_ord; run;
+proc sort data=idade_pres; by grp_ord; run;
+proc sort data=turno_pres; by grp_ord; run;
+proc sort data=renda_gov;  by grp_ord; run;
+proc sort data=idade_gov;  by grp_ord; run;
+proc sort data=turno_gov;  by grp_ord; run;
 
 ods graphics / imagename="presidente_por_renda";
 title "Presidente por Faixa de Renda (% dentro de cada faixa)";
+title2 "Candidatos com menos de 1% dos votos agrupados em 'Outros'";
 proc sgplot data=renda_pres dattrmap=attrmap;
-    vbar renda_ord / response=pct_row group=presidente groupdisplay=stack attrid=candpres;
+    vbar renda_ord / response=pct_row group=presidente_grp groupdisplay=stack
+         grouporder=data attrid=candpres;
     yaxis label="Percentual dentro da faixa (%)" grid;
     xaxis label="Faixa de renda" fitpolicy=rotate;
-    keylegend / title="Candidato" location=outside;
+    keylegend / title="Voto" location=outside;
 run;
 title;
 
 ods graphics / imagename="presidente_por_etaria";
 title "Presidente por Faixa Etária (% dentro de cada faixa)";
+title2 "Candidatos com menos de 1% dos votos agrupados em 'Outros'";
 proc sgplot data=idade_pres dattrmap=attrmap;
-    vbar etaria_ord / response=pct_row group=presidente groupdisplay=stack attrid=candpres;
+    vbar etaria_ord / response=pct_row group=presidente_grp groupdisplay=stack
+         grouporder=data attrid=candpres;
     yaxis label="Percentual dentro da faixa (%)" grid;
     xaxis label="Faixa etária" fitpolicy=rotate;
-    keylegend / title="Candidato" location=outside;
+    keylegend / title="Voto" location=outside;
 run;
 title;
 
 ods graphics / imagename="presidente_por_turno";
 title "Presidente por Turno (% dentro de cada turno)";
+title2 "Candidatos com menos de 1% dos votos agrupados em 'Outros'";
 proc sgplot data=turno_pres dattrmap=attrmap;
-    vbar turno_ord / response=pct_row group=presidente groupdisplay=stack attrid=candpres;
+    vbar turno_ord / response=pct_row group=presidente_grp groupdisplay=stack
+         grouporder=data attrid=candpres;
     yaxis label="Percentual dentro do turno (%)" grid;
     xaxis label="Turno";
-    keylegend / title="Candidato" location=outside;
+    keylegend / title="Voto" location=outside;
 run;
 title;
 
 ods graphics / imagename="governador_por_renda";
 title "Governador por Faixa de Renda (% dentro de cada faixa)";
+title2 "Candidatos com menos de 1% dos votos agrupados em 'Outros'";
 proc sgplot data=renda_gov dattrmap=attrmap;
-    vbar renda_ord / response=pct_row group=governador groupdisplay=stack attrid=candgov;
+    vbar renda_ord / response=pct_row group=governador_grp groupdisplay=stack
+         grouporder=data attrid=candgov;
     yaxis label="Percentual dentro da faixa (%)" grid;
     xaxis label="Faixa de renda" fitpolicy=rotate;
-    keylegend / title="Candidato" location=outside;
+    keylegend / title="Voto" location=outside;
 run;
 title;
 
 ods graphics / imagename="governador_por_etaria";
 title "Governador por Faixa Etária (% dentro de cada faixa)";
+title2 "Candidatos com menos de 1% dos votos agrupados em 'Outros'";
 proc sgplot data=idade_gov dattrmap=attrmap;
-    vbar etaria_ord / response=pct_row group=governador groupdisplay=stack attrid=candgov;
+    vbar etaria_ord / response=pct_row group=governador_grp groupdisplay=stack
+         grouporder=data attrid=candgov;
     yaxis label="Percentual dentro da faixa (%)" grid;
     xaxis label="Faixa etária" fitpolicy=rotate;
-    keylegend / title="Candidato" location=outside;
+    keylegend / title="Voto" location=outside;
 run;
 title;
 
 ods graphics / imagename="governador_por_turno";
 title "Governador por Turno (% dentro de cada turno)";
+title2 "Candidatos com menos de 1% dos votos agrupados em 'Outros'";
 proc sgplot data=turno_gov dattrmap=attrmap;
-    vbar turno_ord / response=pct_row group=governador groupdisplay=stack attrid=candgov;
+    vbar turno_ord / response=pct_row group=governador_grp groupdisplay=stack
+         grouporder=data attrid=candgov;
     yaxis label="Percentual dentro do turno (%)" grid;
     xaxis label="Turno";
-    keylegend / title="Candidato" location=outside;
+    keylegend / title="Voto" location=outside;
 run;
 title;
