@@ -25,6 +25,22 @@ options validvarname=any;   /* permite nomes de coluna com espaço/acento no imp
 %let n_nominal = 400;   /* tamanho da amostra definido para a pesquisa */
 %let K         = 2;     /* intervalo da amostragem sistemática em campo */
 
+/* Tamanho do eleitorado do Distrito Federal (população de referência para
+   Presidente/Governador), conforme TRE-DF, julho/2026: "Distrito Federal
+   ultrapassa 2,56 milhões de eleitores e registra 94,4% do eleitorado
+   apto com biometria". Usado apenas para calcular explicitamente o fpc
+   (correção de população finita) no PROC SURVEYFREQ - com n≈391 e
+   N=2.562.037, f=n/N≈0,000153 e fpc=sqrt(1-f)≈0,99992, ou seja, o efeito
+   numérico é desprezível (não altera as estimativas em casas decimais
+   relevantes). Mantém-se, portanto, a leitura de população "grande" do
+   cabeçalho deste script - este N apenas formaliza/comprova essa escolha
+   com uma fonte, não torna a amostra representativa de todo o DF (a
+   coleta não foi um sorteio probabilístico do eleitorado do DF como um
+   todo, e sim uma amostragem sistemática de visitantes de dois pavilhões
+   específicos - ver limitações no relatório).
+   Fonte: https://www.tre-df.jus.br/comunicacao/noticias/2026/Julho/distrito-federal-ultrapassa-2-56-milhoes-de-eleitores-e-registra-94-4-do-eleitorado-apto-com-biometria-1 */
+%let N_DF = 2562037;
+
 /* -------------------------------------------------------------------------
    SALVAR GRÁFICOS COMO .PNG
    Ajuste "outpath" para o caminho da pasta "imagens" dentro do seu Files
@@ -68,6 +84,11 @@ data amostra;
     set amostra;
     if missing(Timestamp) then delete;   /* descarta linhas vazias (artefato) */
     id = _n_;
+    /* corrige espaço em branco inicial em "Samara Martins (11)" (artefato de
+       digitação no Excel), que fazia essa resposta contar como categoria
+       separada nas tabelas de frequência e ficar sem cor no gráfico */
+    presidente = strip(presidente);
+    governador = strip(governador);
 run;
 
 proc contents data=amostra varnum; run;
@@ -345,27 +366,59 @@ data var_gov_pct;
 run;
 
 /* -------------------------------------------------------------------------
+   6.5 PALETA DE CORES DOS CANDIDATOS
+       Mapa de atributos (ATTRMAP) para fixar a mesma cor a cada candidato
+       em todos os gráficos, independentemente da ordem das barras.
+       ID "candpres" = Presidente | ID "candgov" = Governador.
+       Candidatos sem cor definida pelo usuário ficam com as cores padrão
+       do SAS (ex.: Branco, Nulo, Não sei/não quero responder, Sem resposta).
+   ------------------------------------------------------------------------- */
+data attrmap;
+    length ID $10 VALUE $60 FILLCOLOR LINECOLOR MARKERCOLOR $20;
+
+    ID='candpres'; VALUE='Luiz Inácio Lula da Silva (5)'; FILLCOLOR='red';    LINECOLOR='red';    MARKERCOLOR='red';    output;
+    ID='candpres'; VALUE='Flavio Bolsonaro (3)';           FILLCOLOR='blue';   LINECOLOR='blue';   MARKERCOLOR='blue';   output;
+    ID='candpres'; VALUE='Augusto Cury (0)';               FILLCOLOR='green';  LINECOLOR='green';  MARKERCOLOR='green';  output;
+    ID='candpres'; VALUE='Renan Santos (7)';               FILLCOLOR='gold';   LINECOLOR='gold';   MARKERCOLOR='gold';   output;
+    ID='candpres'; VALUE='Romeu Zema (8)';                 FILLCOLOR='orange'; LINECOLOR='orange'; MARKERCOLOR='orange'; output;
+    ID='candpres'; VALUE='Ronaldo Caiado (9)';             FILLCOLOR='purple'; LINECOLOR='purple'; MARKERCOLOR='purple'; output;
+    ID='candpres'; VALUE='Samara Martins (11)';            FILLCOLOR='brown';  LINECOLOR='brown';  MARKERCOLOR='brown';  output;
+
+    ID='candgov';  VALUE='Leandro Grass (5)';              FILLCOLOR='red';    LINECOLOR='red';    MARKERCOLOR='red';    output;
+    ID='candgov';  VALUE='Celina Leão (0)';                FILLCOLOR='gold';   LINECOLOR='gold';   MARKERCOLOR='gold';   output;
+    ID='candgov';  VALUE='Paula Belmonte (6)';             FILLCOLOR='blue';   LINECOLOR='blue';   MARKERCOLOR='blue';   output;
+    ID='candgov';  VALUE='Kiko Caputo (4)';                FILLCOLOR='orange'; LINECOLOR='orange'; MARKERCOLOR='orange'; output;
+    ID='candgov';  VALUE='Ricardo Cappelli (9)';           FILLCOLOR='green';  LINECOLOR='green';  MARKERCOLOR='green';  output;
+run;
+
+/* -------------------------------------------------------------------------
    7. ESTIMATIVAS DA INTENÇÃO DE VOTO NA POPULAÇÃO (PROC SURVEYFREQ)
-      PROC SURVEYFREQ sem TOTAL=/RATE= assume AAS de uma população
-      grande/infinita (sem fpc) - adequado ao cenário. Registros com
+      TOTAL=&N_DF. informa ao PROC SURVEYFREQ o tamanho do eleitorado do DF
+      (fonte: TRE-DF, ver comentário da macro N_DF no início do script),
+      ativando o cálculo do fpc. Como n válido (~391) é uma fração ínfima
+      de N (~0,015%), fpc≈0,9999 - na prática equivale a tratar a
+      população como infinita (mesmo resultado que se obtinha antes, sem
+      TOTAL=), mas agora o fpc é calculado explicitamente a partir de uma
+      fonte oficial, em vez de apenas presumido. Registros com
       presidente/governador em branco são excluídos automaticamente
       (consistente com o n_valido calculado na seção 4).
    ------------------------------------------------------------------------- */
 title "Estimativa da intenção de voto p/ Presidente (IC 95%)";
-proc surveyfreq data=amostra order=freq;
+proc surveyfreq data=amostra order=freq total=&N_DF.;
     tables presidente / cl;
 run;
 
 title "Estimativa da intenção de voto p/ Governador (IC 95%)";
-proc surveyfreq data=amostra order=freq;
+proc surveyfreq data=amostra order=freq total=&N_DF.;
     tables governador / cl;
 run;
 title;
 
 ods graphics / imagename="voto_presidente_ic";
 title "Intenção de voto - Presidente (%) com IC 95%";
-proc sgplot data=var_pres_pct;
-    hbar presidente / response=pct categoryorder=respdesc datalabel;
+proc sgplot data=var_pres_pct dattrmap=attrmap;
+    hbar presidente / response=pct categoryorder=respdesc datalabel
+         group=presidente attrid=candpres noautolegend;
     scatter x=pct y=presidente / xerrorlower=li_pct xerrorupper=ls_pct
             markerattrs=(symbol=none) lineattrs=(color=black thickness=2);
     xaxis label="Percentual (%)" grid;
@@ -375,8 +428,9 @@ title;
 
 ods graphics / imagename="voto_governador_ic";
 title "Intenção de voto - Governador (%) com IC 95%";
-proc sgplot data=var_gov_pct;
-    hbar governador / response=pct categoryorder=respdesc datalabel;
+proc sgplot data=var_gov_pct dattrmap=attrmap;
+    hbar governador / response=pct categoryorder=respdesc datalabel
+         group=governador attrid=candgov noautolegend;
     scatter x=pct y=governador / xerrorlower=li_pct xerrorupper=ls_pct
             markerattrs=(symbol=none) lineattrs=(color=black thickness=2);
     xaxis label="Percentual (%)" grid;
@@ -450,8 +504,8 @@ run;
 
 ods graphics / imagename="presidente_por_renda";
 title "Presidente por Faixa de Renda (% dentro de cada faixa)";
-proc sgplot data=renda_pres;
-    vbar renda_ord / response=pct_row group=presidente groupdisplay=stack;
+proc sgplot data=renda_pres dattrmap=attrmap;
+    vbar renda_ord / response=pct_row group=presidente groupdisplay=stack attrid=candpres;
     yaxis label="Percentual dentro da faixa (%)" grid;
     xaxis label="Faixa de renda" fitpolicy=rotate;
     keylegend / title="Candidato" location=outside;
@@ -460,8 +514,8 @@ title;
 
 ods graphics / imagename="presidente_por_etaria";
 title "Presidente por Faixa Etária (% dentro de cada faixa)";
-proc sgplot data=idade_pres;
-    vbar etaria_ord / response=pct_row group=presidente groupdisplay=stack;
+proc sgplot data=idade_pres dattrmap=attrmap;
+    vbar etaria_ord / response=pct_row group=presidente groupdisplay=stack attrid=candpres;
     yaxis label="Percentual dentro da faixa (%)" grid;
     xaxis label="Faixa etária" fitpolicy=rotate;
     keylegend / title="Candidato" location=outside;
@@ -470,8 +524,8 @@ title;
 
 ods graphics / imagename="presidente_por_turno";
 title "Presidente por Turno (% dentro de cada turno)";
-proc sgplot data=turno_pres;
-    vbar turno_ord / response=pct_row group=presidente groupdisplay=stack;
+proc sgplot data=turno_pres dattrmap=attrmap;
+    vbar turno_ord / response=pct_row group=presidente groupdisplay=stack attrid=candpres;
     yaxis label="Percentual dentro do turno (%)" grid;
     xaxis label="Turno";
     keylegend / title="Candidato" location=outside;
@@ -480,8 +534,8 @@ title;
 
 ods graphics / imagename="governador_por_renda";
 title "Governador por Faixa de Renda (% dentro de cada faixa)";
-proc sgplot data=renda_gov;
-    vbar renda_ord / response=pct_row group=governador groupdisplay=stack;
+proc sgplot data=renda_gov dattrmap=attrmap;
+    vbar renda_ord / response=pct_row group=governador groupdisplay=stack attrid=candgov;
     yaxis label="Percentual dentro da faixa (%)" grid;
     xaxis label="Faixa de renda" fitpolicy=rotate;
     keylegend / title="Candidato" location=outside;
@@ -490,8 +544,8 @@ title;
 
 ods graphics / imagename="governador_por_etaria";
 title "Governador por Faixa Etária (% dentro de cada faixa)";
-proc sgplot data=idade_gov;
-    vbar etaria_ord / response=pct_row group=governador groupdisplay=stack;
+proc sgplot data=idade_gov dattrmap=attrmap;
+    vbar etaria_ord / response=pct_row group=governador groupdisplay=stack attrid=candgov;
     yaxis label="Percentual dentro da faixa (%)" grid;
     xaxis label="Faixa etária" fitpolicy=rotate;
     keylegend / title="Candidato" location=outside;
@@ -500,8 +554,8 @@ title;
 
 ods graphics / imagename="governador_por_turno";
 title "Governador por Turno (% dentro de cada turno)";
-proc sgplot data=turno_gov;
-    vbar turno_ord / response=pct_row group=governador groupdisplay=stack;
+proc sgplot data=turno_gov dattrmap=attrmap;
+    vbar turno_ord / response=pct_row group=governador groupdisplay=stack attrid=candgov;
     yaxis label="Percentual dentro do turno (%)" grid;
     xaxis label="Turno";
     keylegend / title="Candidato" location=outside;
