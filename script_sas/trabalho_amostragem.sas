@@ -2,9 +2,9 @@
    TRABALHO DE AMOSTRAGEM
    Base: Intenção de voto - Pavilhões (Brasília)
 
-   PLANO AMOSTRAL DE CAMPO: Amostragem Sistemática, com intervalo K=2
-   (a cada 2 pessoas que passavam pelo pavilhão, 1 era abordada, com
-   início aleatório sorteado entre a 1ª e a 2ª pessoa da sequência).
+   PLANO AMOSTRAL DE CAMPO: Amostragem Sistemática, com intervalo K=5
+   (a cada 5 pessoas que passavam pelo pavilhão, 1 era abordada, com
+   início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência).
    Amostra nominal: n = 400, de uma população desconhecida/grande
    (sem correção de população finita - fpc).
 
@@ -12,7 +12,7 @@
    amostragem sistemática é tratada de forma equivalente à AAS - essa é
    a prática padrão quando não há suspeita de periodicidade/tendência
    na ordem de chegada das pessoas no pavilhão (não há motivo para
-   acreditar que a cada 2ª pessoa exista um padrão sistemático de
+   acreditar que a cada 5ª pessoa exista um padrão sistemático de
    intenção de voto). Essa suposição deve ser declarada no relatório.
 
    Objetivo: estimar as proporções de intenção de voto na população,
@@ -23,7 +23,7 @@
 options validvarname=any;   /* permite nomes de coluna com espaço/acento no import */
 
 %let n_nominal = 400;   /* tamanho da amostra definido para a pesquisa */
-%let K         = 2;     /* intervalo da amostragem sistemática em campo */
+%let K         = 5;     /* intervalo da amostragem sistemática em campo */
 
 /* Tamanho do eleitorado do Distrito Federal (população de referência para
    Presidente/Governador), conforme TRE-DF, julho/2026: "Distrito Federal

@@ -15,16 +15,46 @@ format:
     papersize: a4
     fontsize: 11pt
     geometry: margin=2.5cm
-    toc: true
-    toc-title: "Sumário"
+    toc: false
     number-sections: false
     pdf-engine: xelatex
     colorlinks: true
+    linkcolor: black
+    include-in-header:
+      text: |
+        \let\maketitle\relax
 ---
+
+```{=latex}
+\begin{titlepage}
+\centering
+\thispagestyle{empty}
+\includegraphics[width=3cm]{imagens/unb/unb.png}\\[0.8cm]
+{\large UNIVERSIDADE DE BRASÍLIA\\}
+{\large INSTITUTO DE CIÊNCIAS EXATAS\\}
+{\large DEPARTAMENTO DE ESTATÍSTICA\\}
+{\large TÉCNICAS DE AMOSTRAGEM\\[2.5cm]}
+{\Large\bfseries Pesquisa Eleitoral na UnB: Estimação da Intenção de Voto por Amostragem\\[0.4cm]}
+{\large Trabalho de Amostragem --- Técnicas de Amostragem\\[2.5cm]}
+{\large
+Helio Ferreira de Carvalho\\
+Karine Alves de Freitas Leite\\
+Marcos Well Neres Silva Pereira\\
+Caroline Hernandes Amancio\\
+}
+\vfill
+{\large Brasília -- DF}\\
+{\large 2026}
+\end{titlepage}
+
+\renewcommand{\contentsname}{Sumário}
+\tableofcontents
+\newpage
+```
 
 # Resumo
 
-As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática (K=2) tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, com taxa de resposta de 100% nas perguntas de intenção de voto (toda recusa foi registrada explicitamente como "Sem resposta", distinta de "Não sei/não quero responder"). O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (40,50%, IC 95%: [35,67%; 45,33%]) e Leandro Grass para Governador (37,00%, IC 95%: [32,25%; 41,75%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto entre turnos de coleta apenas para o cargo de Governador, não para Presidente, com ressalvas quanto à validade do teste qui-quadrado em todos os cruzamentos dado o pequeno número de observações esperadas em boa parte das células.
+As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática (K=5) tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, com taxa de resposta de 100% nas perguntas de intenção de voto (toda recusa foi registrada explicitamente como "Sem resposta", distinta de "Não sei/não quero responder"). O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (40,50%, IC 95%: [35,67%; 45,33%]) e Leandro Grass para Governador (37,00%, IC 95%: [32,25%; 41,75%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto entre turnos de coleta apenas para o cargo de Governador, não para Presidente, com ressalvas quanto à validade do teste qui-quadrado em todos os cruzamentos dado o pequeno número de observações esperadas em boa parte das células.
 
 **Palavras-chave:** amostragem, amostragem sistemática, pesquisa eleitoral, intervalo de confiança, margem de erro, não-resposta.
 
@@ -36,7 +66,7 @@ No Brasil, esse papel das pesquisas eleitorais ganha relevância em períodos de
 
 Em Brasília, esse cenário se expressa na disputa pelos cargos de Presidente da República e Governador do Distrito Federal, ambos decididos no mesmo pleito. Nesse contexto, conduziu-se uma pesquisa eleitoral presencial na cidade, com coleta de dados realizada junto a visitantes de pavilhões João Calmon e Anísio Teixeira, por meio de um plano amostral sistemático que buscou garantir representatividade ao longo de diferentes turnos do dia (manhã, tarde e noite).
 
-Para tanto, foram abordadas 400 pessoas nos pavilhões Anísio Teixeira e João Calmon por meio de amostragem sistemática (K=2), com início aleatório sorteado entre a 1ª e a 2ª pessoa da sequência de chegada ao pavilhão. Em cada abordagem, registrou-se o sexo, a faixa etária, a faixa de renda familiar, o turno da coleta e a intenção de voto para Presidente e Governador, sendo os casos de recusa tratados como não-resposta.
+Para tanto, foram abordadas 400 pessoas nos pavilhões Anísio Teixeira e João Calmon por meio de amostragem sistemática (K=5), com início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência de chegada ao pavilhão. Em cada abordagem, registrou-se o sexo, a faixa etária, a faixa de renda familiar, o turno da coleta e a intenção de voto para Presidente e Governador, sendo os casos de recusa tratados como não-resposta.
 
 ## 1.1 Objetivos
 
@@ -51,7 +81,7 @@ Os objetivos específicos são:
 
 # 2. Referencial Teórico
 
-A coleta foi conduzida por **amostragem sistemática**, com intervalo $K=2$: a cada 2 pessoas que passavam pelos pavilhões, 1 era abordada, com início aleatório sorteado entre a 1ª e a 2ª pessoa da sequência. Para fins de estimação de variância e erro-padrão, a amostragem sistemática foi tratada de forma equivalente à Amostragem Aleatória Simples sem reposição (AASs) — prática padrão quando a população está em "ordem aleatória" (ausência de periodicidade ou tendência), como justificado por Cochran (1977) e Bolfarine & Bussab (2004).
+A coleta foi conduzida por **amostragem sistemática**, com intervalo $K=5$: a cada 5 pessoas que passavam pelos pavilhões, 1 era abordada, com início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência. Para fins de estimação de variância e erro-padrão, a amostragem sistemática foi tratada de forma equivalente à Amostragem Aleatória Simples sem reposição (AASs) — prática padrão quando a população está em "ordem aleatória" (ausência de periodicidade ou tendência), como justificado por Cochran (1977) e Bolfarine & Bussab (2004).
 
 ## 2.1 Notação e parâmetros populacionais
 
@@ -105,11 +135,11 @@ Considerando uma população com $N$ elementos ordenados de 1 a $N$, com $N=kn$ 
 
 $$\text{elementos selecionados} = r,\ r+k,\ r+2k,\ \dots,\ r+(n-1)k$$
 
-Neste trabalho, $k=K=2$. Cochran (1977, Seção 8.2) mostra que a amostragem sistemática equivale à seleção aleatória de **um único conglomerado** dentre $k$ conglomerados possíveis (cada um com $n$ unidades), de modo que sua variância verdadeira é:
+Neste trabalho, $k=K=5$. Cochran (1977, Seção 8.2) mostra que a amostragem sistemática equivale à seleção aleatória de **um único conglomerado** dentre $k$ conglomerados possíveis (cada um com $n$ unidades), de modo que sua variância verdadeira é:
 
 $$V(\bar{y}_{sis}) = \frac{N-1}{N}S^2 - \frac{k(n-1)}{N}S^2_{wsy}$$
 
-(Cochran, 1977, Teorema 8.1; equivalentemente, Bolfarine & Bussab, 2004, Eq. 7.6–7.8, em termos do coeficiente de correlação intraclasse $\rho_{int}$: $V_k=\{1+\rho_{int}(n-1)\}\,\sigma^2/n$). Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004, Eq. 7.7; Corolário 3.5). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=2$) como equivalente à da AASs.
+(Cochran, 1977, Teorema 8.1; equivalentemente, Bolfarine & Bussab, 2004, Eq. 7.6–7.8, em termos do coeficiente de correlação intraclasse $\rho_{int}$: $V_k=\{1+\rho_{int}(n-1)\}\,\sigma^2/n$). Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004, Eq. 7.7; Corolário 3.5). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=5$) como equivalente à da AASs.
 
 # 3. Materiais e Métodos
 
@@ -117,7 +147,7 @@ Toda a análise estatística deste trabalho foi conduzida no **software SAS**, u
 
 ## 3.1 Local e procedimento de coleta
 
-A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo foi a **amostragem sistemática com $K=2$**: a cada 2 pessoas que passavam pelo local, 1 era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a 2ª pessoa da sequência de chegada.
+A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo foi a **amostragem sistemática com $K=5$**: a cada 5 pessoas que passavam pelo local, 1 era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência de chegada.
 
 ![Local de coleta — pavilhão na UnB](imagens/imagens_coleta/local_coleta_unb.jpeg){width=70%}
 
@@ -335,13 +365,13 @@ Os testes qui-quadrado de associação entre o candidato escolhido e cada variá
 
 # 5. Conclusões
 
-A pesquisa eleitoral conduzida em Brasília, com uma amostra de 400 eleitores coletados por amostragem sistemática (K=2), permitiu estimar a intenção de voto para Presidente e Governador com margem de erro de aproximadamente ±4,91 pontos percentuais. A taxa de resposta às perguntas de voto foi de 100% — toda recusa foi registrada explicitamente como "Sem resposta", o que elimina a distinção entre margem de erro nominal e efetiva presente em versões anteriores da análise.
+A pesquisa eleitoral conduzida em Brasília, com uma amostra de 400 eleitores coletados por amostragem sistemática (K=5), permitiu estimar a intenção de voto para Presidente e Governador com margem de erro de aproximadamente ±4,91 pontos percentuais. A taxa de resposta às perguntas de voto foi de 100% — toda recusa foi registrada explicitamente como "Sem resposta", o que elimina a distinção entre margem de erro nominal e efetiva presente em versões anteriores da análise.
 
 O candidato à Presidência com maior intenção de voto foi **Luiz Inácio Lula da Silva** (40,50%, IC 95%: [35,67%; 45,33%]), seguido por uma parcela expressiva de indecisos ("Não sei/não quero responder", 23,00%) e de quem optou por "Sem resposta" (13,25%). Para Governador, o líder foi **Leandro Grass** (37,00%, IC 95%: [32,25%; 41,75%]), também com grande parcela de indecisos (29,25%).
 
 A análise por subgrupos indicou diferença estatisticamente significativa na intenção de voto entre os turnos de coleta apenas para o cargo de Governador (p=0,0105); para Presidente, não houve evidência de associação (p=0,1586). Mesmo o resultado significativo deve ser interpretado com cautela, já que a validade do teste é limitada pela baixa contagem esperada em boa parte das células (64% e 69% das células, respectivamente), decorrente do pequeno número de entrevistas no turno da Noite (n=20). Recomenda-se tratar o achado de Governador x Turno como indício a ser investigado, não como conclusão definitiva.
 
-Como limitações do estudo, destacam-se: (i) a suposição de tratar o plano sistemático (K=2) como equivalente à AAS para fins de cálculo de variância, válida apenas na ausência de periodicidade na ordem de chegada dos entrevistados; e (ii) a forte concentração da amostra no turno da manhã (78,25%) e na faixa etária de 19 a 24 anos (49,00%), que limita a representatividade do levantamento em relação ao eleitorado geral da cidade. A inconsistência de digitação anteriormente identificada no candidato "Samara Martins" (duas grafias distintas) foi corrigida no tratamento dos dados (Seção 3.1), e a base final não apresenta mais valores ausentes em nenhuma variável de perfil ou de voto (Seção 3.4).
+Como limitações do estudo, destacam-se: (i) a suposição de tratar o plano sistemático (K=5) como equivalente à AAS para fins de cálculo de variância, válida apenas na ausência de periodicidade na ordem de chegada dos entrevistados; e (ii) a forte concentração da amostra no turno da manhã (78,25%) e na faixa etária de 19 a 24 anos (49,00%), que limita a representatividade do levantamento em relação ao eleitorado geral da cidade. A inconsistência de digitação anteriormente identificada no candidato "Samara Martins" (duas grafias distintas) foi corrigida no tratamento dos dados (Seção 3.1), e a base final não apresenta mais valores ausentes em nenhuma variável de perfil ou de voto (Seção 3.4).
 
 # Referências {.unnumbered}
 
