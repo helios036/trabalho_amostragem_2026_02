@@ -56,7 +56,7 @@ ods graphics on / width=800px height=500px imagefmt=png reset=all;
    1. IMPORTAÇÃO DA AMOSTRA
    ------------------------------------------------------------------------- */
 proc import out=amostra_raw
-    datafile="/home/helios_0190/intenções_de_voto_pavilhões.xlsx"
+    datafile="/home/helios_0190/intenções_de_voto_pavilhões_v2.xlsx"
     dbms=xlsx replace;
     getnames=yes;
 run;
@@ -64,10 +64,16 @@ run;
 /* -------------------------------------------------------------------------
    2. PREPARAÇÃO
       - renomeia colunas
-      - remove linhas totalmente vazias (artefato da tabela do Excel:
-        o arquivo possui 18 linhas em branco no final, sem nenhum dado -
-        não são respondentes, por isso são descartadas)
+      - remove linhas totalmente vazias (artefato da tabela do Excel)
       - cria identificador único
+      - NESTA VERSÃO (v2) da planilha, a não-resposta em Presidente/
+        Governador/Faixa etária/Faixa de renda aparece como célula
+        genuinamente em branco (136 respondentes, 34%) - não há mais o
+        texto "Sem resposta" em Presidente/Governador. Em Faixa etária/
+        Faixa de renda, "Sem resposta" ainda aparece como opção
+        explícita (5 e 27 casos) ao lado de células em branco (136) -
+        as duas coisas são unificadas sob o mesmo rótulo "Sem resposta"
+        abaixo, pois ali é uma opção legítima do perfil, não recusa.
    ------------------------------------------------------------------------- */
 data amostra;
     set amostra_raw;
@@ -89,14 +95,18 @@ data amostra;
        separada nas tabelas de frequência e ficar sem cor no gráfico */
     presidente = strip(presidente);
     governador = strip(governador);
-    /* "Sem resposta" é o código usado em campo para recusa na pergunta de
-       voto (evidenciado pelos 9 respondentes antes em branco terem sido
-       recodificados exatamente para "Sem resposta" numa revisão posterior
-       da planilha) - trata-se como não-resposta (missing), não como
-       categoria de voto válida. Diferente de "Não sei/não quero
-       responder", que é uma resposta engajada (a pessoa respondeu, só não
-       quis/soube nomear um candidato) e continua válida. NÃO se aplica a
-       faixa_etaria/faixa_renda, onde "Sem resposta" é uma opção legítima. */
+    /* Faixa etária/renda: célula em branco = mesma coisa que a opção
+       explícita "Sem resposta" (ambas significam que a pessoa não
+       informou essa variável de perfil) - unifica num só rótulo. */
+    if missing(faixa_etaria) then faixa_etaria = 'Sem resposta';
+    if missing(faixa_renda)  then faixa_renda  = 'Sem resposta';
+    /* Presidente/Governador: célula em branco é recusa à pergunta de
+       voto - mantém como missing (não-resposta), diferente de "Não
+       sei/não quero responder", que é resposta engajada e válida.
+       Nesta versão (v2) da planilha não existe mais o texto "Sem
+       resposta" nessas duas colunas (só célula em branco), mas a linha
+       abaixo é mantida por segurança caso o texto reapareça numa
+       futura atualização da planilha. */
     if presidente = 'Sem resposta' then presidente = '';
     if governador = 'Sem resposta' then governador = '';
 run;

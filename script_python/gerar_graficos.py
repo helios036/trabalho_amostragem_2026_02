@@ -1,7 +1,7 @@
 """
 Gera os graficos do trabalho de amostragem (substitui os PROC SGPLOT do SAS).
 
-Le a mesma base (intencoes_de_voto_pavilhoes.xlsx), replica a limpeza e as
+Le a mesma base (intencoes_de_voto_pavilhoes_v2.xlsx), replica a limpeza e as
 regras de negocio ja implementadas em script_sas/trabalho_amostragem.sas
 (strip() em Samara Martins, grupo "Outros" <1% dos votos validos, formula
 de Cochran com divisor n-1 e IC via t-Student) e salva os PNGs em imagens/.
@@ -25,7 +25,7 @@ import pandas as pd
 from scipy import stats
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_PATH = BASE_DIR / "intenções_de_voto_pavilhões.xlsx"
+DATA_PATH = BASE_DIR / "intenções_de_voto_pavilhões_v2.xlsx"
 OUT_DIR = BASE_DIR / "imagens" / "imagens_python"
 OUT_DIR.mkdir(exist_ok=True)
 
@@ -69,14 +69,20 @@ def limpar_nome(nome):
 df["presidente"] = df["presidente"].apply(limpar_nome)
 df["governador"] = df["governador"].apply(limpar_nome)
 
-# "Sem resposta" e o codigo usado em campo para recusa na pergunta de voto
-# (os 9 respondentes antes em branco foram recodificados exatamente para
-# "Sem resposta" numa revisao posterior da planilha) - trata-se como
-# nao-resposta (NaN), nao como categoria de voto valida. Diferente de "Nao
-# sei/nao quero responder", que e uma resposta engajada e continua valida.
-# NAO se aplica a faixa_etaria/faixa_renda, onde "Sem resposta" e legitima.
+# Nesta versao (v2) da planilha, a nao-resposta em Presidente/Governador
+# aparece como celula genuinamente em branco (136 respondentes, 34%), nao
+# mais como o texto "Sem resposta" - fica como NaN, excluida do calculo de
+# p_hat/IC. Diferente de "Nao sei/nao quero responder", que e uma resposta
+# engajada e continua valida. A linha abaixo fica como seguranca, caso o
+# texto "Sem resposta" reapareca numa futura atualizacao da planilha.
 df["presidente"] = df["presidente"].replace("Sem resposta", np.nan)
 df["governador"] = df["governador"].replace("Sem resposta", np.nan)
+
+# Faixa etaria/renda: celula em branco = mesma coisa que a opcao explicita
+# "Sem resposta" (ambas sao igualmente legitimas - a pessoa so nao
+# informou essa variavel de perfil, diferente de recusar a pesquisa toda).
+df["faixa_etaria"] = df["faixa_etaria"].fillna("Sem resposta")
+df["faixa_renda"] = df["faixa_renda"].fillna("Sem resposta")
 
 n_nominal = len(df)
 
