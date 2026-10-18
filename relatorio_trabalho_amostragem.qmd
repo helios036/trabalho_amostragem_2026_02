@@ -35,12 +35,11 @@ format:
 {\large DEPARTAMENTO DE ESTATÍSTICA\\}
 {\large TÉCNICAS DE AMOSTRAGEM\\[2.5cm]}
 {\Large\bfseries Pesquisa Eleitoral na UnB: Estimação da Intenção de Voto por Amostragem\\[0.4cm]}
-{\large Trabalho de Amostragem --- Técnicas de Amostragem\\[2.5cm]}
 {\large
+Caroline Hernandes Amancio\\
 Helio Ferreira de Carvalho\\
 Karine Alves de Freitas Leite\\
 Marcos Well Neres Silva Pereira\\
-Caroline Hernandes Amancio\\
 }
 \vfill
 {\large Brasília -- DF}\\
