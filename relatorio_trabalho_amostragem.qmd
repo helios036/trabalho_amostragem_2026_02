@@ -23,6 +23,7 @@ format:
     include-in-header:
       text: |
         \let\maketitle\relax
+        \usepackage{booktabs}
 ---
 
 ```{=latex}
@@ -49,11 +50,13 @@ Marcos Well Neres Silva Pereira\\
 \renewcommand{\contentsname}{Sumário}
 \tableofcontents
 \newpage
+
+
 ```
 
 # Resumo
 
-As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática (K=5) tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, com taxa de resposta de 100% nas perguntas de intenção de voto (toda recusa foi registrada explicitamente como "Sem resposta", distinta de "Não sei/não quero responder"). O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (40,50%, IC 95%: [35,67%; 45,33%]) e Leandro Grass para Governador (37,00%, IC 95%: [32,25%; 41,75%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto entre turnos de coleta apenas para o cargo de Governador, não para Presidente, com ressalvas quanto à validade do teste qui-quadrado em todos os cruzamentos dado o pequeno número de observações esperadas em boa parte das células.
+As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática, tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, com taxa de resposta de 100% nas perguntas de intenção de voto (toda recusa foi registrada explicitamente como "Sem resposta", distinta de "Não sei/não quero responder"). O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (40,50%, IC 95%: [35,67%; 45,33%]) e Leandro Grass para Governador (37,00%, IC 95%: [32,25%; 41,75%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto entre turnos de coleta apenas para o cargo de Governador, não para Presidente, com ressalvas quanto à validade do teste qui-quadrado em todos os cruzamentos dado o pequeno número de observações esperadas em boa parte das células.
 
 **Palavras-chave:** amostragem, amostragem sistemática, pesquisa eleitoral, intervalo de confiança, margem de erro, não-resposta.
 
@@ -65,7 +68,7 @@ No Brasil, esse papel das pesquisas eleitorais ganha relevância em períodos de
 
 Em Brasília, esse cenário se expressa na disputa pelos cargos de Presidente da República e Governador do Distrito Federal, ambos decididos no mesmo pleito. Nesse contexto, conduziu-se uma pesquisa eleitoral presencial na cidade, com coleta de dados realizada junto a visitantes de pavilhões João Calmon e Anísio Teixeira, por meio de um plano amostral sistemático que buscou garantir representatividade ao longo de diferentes turnos do dia (manhã, tarde e noite).
 
-Para tanto, foram abordadas 400 pessoas nos pavilhões Anísio Teixeira e João Calmon por meio de amostragem sistemática (K=5), com início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência de chegada ao pavilhão. Em cada abordagem, registrou-se o sexo, a faixa etária, a faixa de renda familiar, o turno da coleta e a intenção de voto para Presidente e Governador, sendo os casos de recusa tratados como não-resposta.
+Para tanto, foram abordadas 400 pessoas nos pavilhões Anísio Teixeira e João Calmon por meio de amostragem sistemática, com início aleatório sorteado entre a 1ª e a kª pessoa da sequência de chegada ao pavilhão. Em cada abordagem, registrou-se o sexo, a faixa etária, a faixa de renda familiar, o turno da coleta e a intenção de voto para Presidente e Governador, sendo os casos de recusa tratados como não-resposta.
 
 ## 1.1 Objetivos
 
@@ -80,7 +83,21 @@ Os objetivos específicos são:
 
 # 2. Referencial Teórico
 
-A coleta foi conduzida por **amostragem sistemática**, com intervalo $K=5$: a cada 5 pessoas que passavam pelos pavilhões, 1 era abordada, com início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência. Para fins de estimação de variância e erro-padrão, a amostragem sistemática foi tratada de forma equivalente à Amostragem Aleatória Simples sem reposição (AASs) — prática padrão quando a população está em "ordem aleatória" (ausência de periodicidade ou tendência), como justificado por Cochran (1977) e Bolfarine & Bussab (2004).
+A coleta de dados foi conduzida por meio de **amostragem sistemática**, utilizando um intervalo de seleção \(K=k\). Nesse procedimento, a cada \(k\) pessoas que passavam pelos pavilhões, uma era selecionada para participar da pesquisa. O processo teve início a partir de um ponto aleatório, definido por sorteio entre a 1ª e a \(k\)-ésima pessoa da sequência.
+
+O ponto inicial de cada entrevistador foi determinado a partir dos números aleatórios fornecidos pelo professor no início da disciplina, conforme apresentado na tabela a seguir:
+
+
+| Entrevistador | Número aleatório |
+|:--------------|-----------------:|
+| Caroline      | 1                |
+| Helio         | 5                |
+| Karine        | 8                |
+| Marcos Well   | 10               |
+
+
+
+Para fins de **estimação da variância e do erro-padrão**, a amostragem sistemática foi tratada como equivalente à **Amostragem Aleatória Simples sem reposição (AASs)**. Essa aproximação é adequada quando a população pode ser considerada em **ordem aleatória**, isto é, quando não há evidências de periodicidade, tendência ou outro padrão sistemático associado à variável de interesse. Essa abordagem é discutida na literatura clássica de amostragem, conforme Cochran (1977) e Bolfarine e Bussab (2004).
 
 ## 2.1 Notação e parâmetros populacionais
 
@@ -134,11 +151,11 @@ Considerando uma população com $N$ elementos ordenados de 1 a $N$, com $N=kn$ 
 
 $$\text{elementos selecionados} = r,\ r+k,\ r+2k,\ \dots,\ r+(n-1)k$$
 
-Neste trabalho, $k=K=5$. Cochran (1977, Seção 8.2) mostra que a amostragem sistemática equivale à seleção aleatória de **um único conglomerado** dentre $k$ conglomerados possíveis (cada um com $n$ unidades), de modo que sua variância verdadeira é:
+Neste trabalho, $k=K$. Cochran (1977, Seção 8.2) mostra que a amostragem sistemática equivale à seleção aleatória de **um único conglomerado** dentre $k$ conglomerados possíveis (cada um com $n$ unidades), de modo que sua variância verdadeira é:
 
 $$V(\bar{y}_{sis}) = \frac{N-1}{N}S^2 - \frac{k(n-1)}{N}S^2_{wsy}$$
 
-(Cochran, 1977, Teorema 8.1; equivalentemente, Bolfarine & Bussab, 2004, Eq. 7.6–7.8, em termos do coeficiente de correlação intraclasse $\rho_{int}$: $V_k=\{1+\rho_{int}(n-1)\}\,\sigma^2/n$). Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004, Eq. 7.7; Corolário 3.5). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=5$) como equivalente à da AASs.
+(Cochran, 1977, Teorema 8.1; equivalentemente, Bolfarine & Bussab, 2004, Eq. 7.6–7.8, em termos do coeficiente de correlação intraclasse $\rho_{int}$: $V_k=\{1+\rho_{int}(n-1)\}\,\sigma^2/n$). Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004, Eq. 7.7; Corolário 3.5). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=k$) como equivalente à da AASs.
 
 # 3. Materiais e Métodos
 
@@ -146,9 +163,13 @@ Toda a análise estatística deste trabalho foi conduzida no **software SAS**, u
 
 ## 3.1 Local e procedimento de coleta
 
-A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo foi a **amostragem sistemática com $K=5$**: a cada 5 pessoas que passavam pelo local, 1 era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência de chegada.
+A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo foi a **amostragem sistemática com $K=k$**: a cada k pessoas que passavam pelo local, 1 era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a kª pessoa da sequência de chegada.
 
 ![Local de coleta — pavilhão na UnB](imagens/imagens_coleta/local_coleta_unb.jpeg){width=70%}
+
+
+<!--
+
 
 ```{=latex}
 \begin{center}
@@ -179,18 +200,9 @@ A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por
 \end{minipage}
 \end{center}
 ```
+-->
 
-A coleta foi dividida em três turnos (Manhã, Tarde e Noite), cada um conduzido por um membro/subgrupo da equipe. Antes da análise, foram descartadas 18 linhas totalmente vazias ao final da planilha (artefato da ferramenta de coleta), restando 400 registros válidos. Também foi identificada uma inconsistência de digitação na base: a resposta "Samara Martins (11)" aparecia sob duas grafias (uma com espaço em branco inicial), o que a fazia contar como duas categorias distintas nas tabelas de frequência. Essa inconsistência foi corrigida com `strip()` nas colunas de candidato:
-
-```sas
-data amostra;
-    set amostra;
-    if missing(Timestamp) then delete;   /* descarta linhas vazias (artefato) */
-    id = _n_;
-    presidente = strip(presidente);
-    governador = strip(governador);
-run;
-```
+A coleta foi dividida em três turnos (Manhã, Tarde e Noite), cada um conduzido por um membro/subgrupo da equipe, seguindo o amostragem sistemática com o respectivo número aleatório inicial, $k_i$ para cada entrevistador $i$.
 
 ## 3.2 População de referência e correção de população finita (fpc)
 
@@ -232,7 +244,7 @@ run;
 
 ## 3.4 Tratamento da não-resposta
 
-Quando um visitante era abordado e recusava participar da pesquisa ("Você quer fazer a pesquisa?" / "Não"), a recusa era documentada fotograficamente em campo e registrada no instrumento de coleta. Na base final utilizada nesta análise, todas essas recusas foram codificadas explicitamente como **"Sem resposta"** — uma categoria de resposta válida, diferente de **"Não sei/não quero responder"** (que indica um respondente que engajou com a pergunta, mas declarou indecisão ou preferiu não revelar o voto). Por isso, não há nenhum valor ausente (*missing*) nas variáveis de intenção de voto: a taxa de resposta é de **100%** para Presidente e Governador, inclusive sem diferença entre sexos (ver Figura abaixo). Essa distinção é importante — agrupar "Sem resposta" com "Não sei/não quero responder" misturaria um problema de qualidade/cobertura da coleta com um achado substantivo sobre indecisão do eleitorado, por isso as duas categorias são mantidas separadas em todas as tabelas e gráficos deste relatório:
+Quando um visitante era abordado e recusava participar da pesquisa ("Você gostaria de fazer uma pesquisa de intenção de voto?" / "Não"), a recusa era documentada fotograficamente em campo e registrada no instrumento de coleta. Na base final utilizada nesta análise, todas essas recusas foram codificadas explicitamente como **"Sem resposta"** — uma categoria de resposta válida, diferente de **"Não sei/não quero responder"** (que indica um respondente que engajou com a pergunta, mas declarou indecisão ou preferiu não revelar o voto). Por isso, não há nenhum valor ausente (*missing*) nas variáveis de intenção de voto: a taxa de resposta é de **100%** para Presidente e Governador, inclusive sem diferença entre sexos (ver Figura abaixo). Essa distinção é importante — agrupar "Sem resposta" com "Não sei/não quero responder" misturaria um problema de qualidade/cobertura da coleta com um achado substantivo sobre indecisão do eleitorado, por isso as duas categorias são mantidas separadas em todas as tabelas e gráficos deste relatório:
 
 ```sas
 data amostra;
