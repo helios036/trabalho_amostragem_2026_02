@@ -8,8 +8,12 @@ de Cochran com divisor n-1 e IC via t-Student) e salva os PNGs em imagens/.
 
 Paleta de cores validada com o script validate_palette.js da skill dataviz
 (CVD-safe para as cores "de candidato"; os tons de cinza para Branco/Nulo/
-Sem resposta/Nao sei sao propositalmente de baixo croma - a identificacao
-deles nao depende de cor, ja que a legenda sempre traz o rotulo em texto).
+Nao sei sao propositalmente de baixo croma - a identificacao deles nao
+depende de cor, ja que a legenda sempre traz o rotulo em texto).
+
+"Sem resposta" e tratada como nao-resposta (recusa), nao como categoria
+de voto - ver comentario na limpeza dos dados, logo apos a leitura do
+Excel.
 """
 import re
 from pathlib import Path
@@ -22,7 +26,7 @@ from scipy import stats
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_PATH = BASE_DIR / "intenções_de_voto_pavilhões.xlsx"
-OUT_DIR = BASE_DIR / "imagens"
+OUT_DIR = BASE_DIR / "imagens" / "imagens_python"
 OUT_DIR.mkdir(exist_ok=True)
 
 N_DF = 2_562_037  # TRE-DF, julho/2026 - usado so para registro, fpc desprezivel
@@ -65,6 +69,15 @@ def limpar_nome(nome):
 df["presidente"] = df["presidente"].apply(limpar_nome)
 df["governador"] = df["governador"].apply(limpar_nome)
 
+# "Sem resposta" e o codigo usado em campo para recusa na pergunta de voto
+# (os 9 respondentes antes em branco foram recodificados exatamente para
+# "Sem resposta" numa revisao posterior da planilha) - trata-se como
+# nao-resposta (NaN), nao como categoria de voto valida. Diferente de "Nao
+# sei/nao quero responder", que e uma resposta engajada e continua valida.
+# NAO se aplica a faixa_etaria/faixa_renda, onde "Sem resposta" e legitima.
+df["presidente"] = df["presidente"].replace("Sem resposta", np.nan)
+df["governador"] = df["governador"].replace("Sem resposta", np.nan)
+
 n_nominal = len(df)
 
 TURNO_ORDER = ["Manhã", "Tarde", "Noite"]
@@ -79,11 +92,13 @@ df["faixa_etaria"] = pd.Categorical(df["faixa_etaria"], categories=ETARIA_ORDER,
 
 # ---------------------------------------------------------------------------
 # 3. GRUPO "OUTROS" (<1% dos votos validos) - replica Secao 6.5 do .sas
-#    Exatamente como no SAS: Branco/Nulo/Sem resposta/Nao sei NUNCA entram em
-#    "Outros", mesmo que (hipoteticamente) ficassem abaixo de 1%.
+#    Exatamente como no SAS: Branco/Nulo/Nao sei NUNCA entram em "Outros",
+#    mesmo que (hipoteticamente) ficassem abaixo de 1%. "Sem resposta" nao
+#    entra nessa lista porque agora e nao-resposta (NaN), nunca aparece
+#    como categoria.
 # ---------------------------------------------------------------------------
-NAO_VOTO_PRES = {"Branco", "Nulo", "Não sei/não quero responder", "Sem resposta"}
-NAO_VOTO_GOV = {"Branco", "Nulo", "Não sei / Não quero responder", "Sem resposta"}
+NAO_VOTO_PRES = {"Branco", "Nulo", "Não sei/não quero responder"}
+NAO_VOTO_GOV = {"Branco", "Nulo", "Não sei / Não quero responder"}
 
 
 def agrupar_outros(serie: pd.Series, excluidos: set) -> pd.Series:
@@ -148,7 +163,6 @@ PALETA_PRES = {
     "Outros": "#C2A878",
     "Branco": "#BFBFBF",
     "Nulo": "#808080",
-    "Sem resposta": "#595959",
     "Não sei/não quero responder": "#404040",
 }
 PALETA_GOV = {
@@ -160,7 +174,6 @@ PALETA_GOV = {
     "Outros": "#C2A878",
     "Branco": "#BFBFBF",
     "Nulo": "#808080",
-    "Sem resposta": "#595959",
     "Não sei / Não quero responder": "#404040",
 }
 ORDEM_PRES = list(PALETA_PRES.keys())

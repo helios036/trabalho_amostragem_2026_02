@@ -89,6 +89,16 @@ data amostra;
        separada nas tabelas de frequência e ficar sem cor no gráfico */
     presidente = strip(presidente);
     governador = strip(governador);
+    /* "Sem resposta" é o código usado em campo para recusa na pergunta de
+       voto (evidenciado pelos 9 respondentes antes em branco terem sido
+       recodificados exatamente para "Sem resposta" numa revisão posterior
+       da planilha) - trata-se como não-resposta (missing), não como
+       categoria de voto válida. Diferente de "Não sei/não quero
+       responder", que é uma resposta engajada (a pessoa respondeu, só não
+       quis/soube nomear um candidato) e continua válida. NÃO se aplica a
+       faixa_etaria/faixa_renda, onde "Sem resposta" é uma opção legítima. */
+    if presidente = 'Sem resposta' then presidente = '';
+    if governador = 'Sem resposta' then governador = '';
 run;
 
 proc contents data=amostra varnum; run;
@@ -214,11 +224,14 @@ title;
 
 /* -------------------------------------------------------------------------
    4. NÃO-RESPOSTA (item non-response)
-      Quantifica quantos respondentes deixaram Presidente/Governador em
-      branco (diferente da categoria "Não sei/Não quero responder", que é
-      uma resposta válida registrada). Também verifica se a não-resposta
-      se distribui igualmente entre os sexos (checagem de não-resposta
-      diferencial, que pode indicar viés).
+      Quantifica quantos respondentes recusaram responder Presidente/
+      Governador - isso inclui tanto quem ficou literalmente em branco
+      quanto quem marcou "Sem resposta" (ambos já viram missing() na
+      seção 2, ver comentário lá), diferente da categoria "Não sei/Não
+      quero responder", que é uma resposta válida e engajada (a pessoa
+      respondeu, só não quis/soube nomear um candidato). Também verifica
+      se a não-resposta se distribui igualmente entre os sexos (checagem
+      de não-resposta diferencial, que pode indicar viés).
    ------------------------------------------------------------------------- */
 data amostra;
     set amostra;
@@ -364,11 +377,13 @@ title;
    6.5 GRUPO "OUTROS" (candidatos com menos de 1% dos votos válidos)
        Consolida, em cada cargo, todo candidato cuja contagem represente
        menos de 1% de n_valido - isso inclui Romeu Zema (8), que tem cor
-       própria definida na paleta (seção 6.7) mas apenas 1 voto (0,26%):
+       própria definida na paleta (seção 6.7) mas apenas 1 voto (0,29%):
        por decisão explícita, o critério de 1% é aplicado sem exceção.
-       Branco, Nulo, "Sem resposta" e "Não sei/não quero responder" NUNCA
-       entram em "Outros" (não são candidatos) - na prática, de toda
-       forma, todos ficam acima de 1% nos dois cargos. O formato é
+       Branco, Nulo e "Não sei/não quero responder" NUNCA entram em
+       "Outros" (não são candidatos) - na prática, de toda forma, todos
+       ficam acima de 1% nos dois cargos. "Sem resposta" não entra na
+       conta nem nessa lista porque agora é tratada como não-resposta
+       (missing), não como categoria de voto (seção 2.2). O formato é
        construído via lookup em hash object a partir das contagens já
        calculadas em freq_pres/freq_gov (seção 6), então se recalcula
        sozinho a cada nova rodada (se os votos mudarem, quem entra em
@@ -396,14 +411,14 @@ data amostra;
     if hpres.find() = 0
        and (count_pres / &n_valid_pres.) < 0.01
        and presidente not in ('Branco (13)', 'Nulo (14)',
-             'Não sei/não quero responder (15)', 'Sem resposta')
+             'Não sei/não quero responder (15)')
         then presidente_grp = 'Outros';
         else presidente_grp = presidente;
 
     if hgov.find() = 0
        and (count_gov / &n_valid_gov.) < 0.01
        and governador not in ('Branco (11)', 'Nulo (12)',
-             'Não sei / Não quero responder (13)', 'Sem resposta')
+             'Não sei / Não quero responder (13)')
         then governador_grp = 'Outros';
         else governador_grp = governador;
 
@@ -452,9 +467,11 @@ run;
    6.7 PALETA DE CORES E ORDEM DA LEGENDA
        ATTRMAP fixa a cor de cada candidato/categoria (ID "candpres" =
        Presidente | ID "candgov" = Governador). Situações de não-voto
-       (Branco, Nulo, Sem resposta, Não sei/não quero responder) recebem
-       tons de cinza, para ficarem visualmente separadas dos candidatos
-       na legenda. "Outros" recebe uma cor neutra própria. Os formatos
+       (Branco, Nulo, Não sei/não quero responder) recebem tons de cinza,
+       para ficarem visualmente separadas dos candidatos na legenda.
+       "Sem resposta" não aparece aqui pois agora é tratada como
+       não-resposta (missing), não como categoria de voto (seção 2.2).
+       "Outros" recebe uma cor neutra própria. Os formatos
        $presgrpord/$govgrpord fixam a ORDEM da legenda nos gráficos
        empilhados (seção 8.3): primeiro as situações de não-voto, depois
        os candidatos nomeados (ordem decrescente de votos), e "Outros"
@@ -466,7 +483,6 @@ data attrmap;
     /* situações de não-voto - tons de cinza */
     ID='candpres'; VALUE='Branco (13)';                     FILLCOLOR='cxBFBFBF'; LINECOLOR='cxBFBFBF'; MARKERCOLOR='cxBFBFBF'; output;
     ID='candpres'; VALUE='Nulo (14)';                        FILLCOLOR='cx808080'; LINECOLOR='cx808080'; MARKERCOLOR='cx808080'; output;
-    ID='candpres'; VALUE='Sem resposta';                     FILLCOLOR='cx595959'; LINECOLOR='cx595959'; MARKERCOLOR='cx595959'; output;
     ID='candpres'; VALUE='Não sei/não quero responder (15)'; FILLCOLOR='cx404040'; LINECOLOR='cx404040'; MARKERCOLOR='cx404040'; output;
 
     /* candidatos nomeados */
@@ -482,7 +498,6 @@ data attrmap;
 
     ID='candgov';  VALUE='Branco (11)';                       FILLCOLOR='cxBFBFBF'; LINECOLOR='cxBFBFBF'; MARKERCOLOR='cxBFBFBF'; output;
     ID='candgov';  VALUE='Nulo (12)';                          FILLCOLOR='cx808080'; LINECOLOR='cx808080'; MARKERCOLOR='cx808080'; output;
-    ID='candgov';  VALUE='Sem resposta';                       FILLCOLOR='cx595959'; LINECOLOR='cx595959'; MARKERCOLOR='cx595959'; output;
     ID='candgov';  VALUE='Não sei / Não quero responder (13)'; FILLCOLOR='cx404040'; LINECOLOR='cx404040'; MARKERCOLOR='cx404040'; output;
 
     ID='candgov';  VALUE='Leandro Grass (5)';              FILLCOLOR='red';    LINECOLOR='red';    MARKERCOLOR='red';    output;
@@ -498,7 +513,6 @@ proc format;
     value $presgrpord
         'Branco (13)'                     = '01'
         'Nulo (14)'                        = '02'
-        'Sem resposta'                     = '03'
         'Não sei/não quero responder (15)' = '04'
         'Luiz Inácio Lula da Silva (5)'    = '05'
         'Renan Santos (7)'                 = '06'
@@ -510,7 +524,6 @@ proc format;
     value $govgrpord
         'Branco (11)'                       = '01'
         'Nulo (12)'                          = '02'
-        'Sem resposta'                       = '03'
         'Não sei / Não quero responder (13)' = '04'
         'Leandro Grass (5)'                  = '05'
         'Celina Leão (0)'                    = '06'
