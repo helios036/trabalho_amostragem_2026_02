@@ -180,17 +180,7 @@ A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por
 \end{center}
 ```
 
-A coleta foi dividida em três turnos (Manhã, Tarde e Noite), cada um conduzido por um membro/subgrupo da equipe. Antes da análise, foram descartadas 18 linhas totalmente vazias ao final da planilha (artefato da ferramenta de coleta), restando 400 registros válidos. Também foi identificada uma inconsistência de digitação na base: a resposta "Samara Martins (11)" aparecia sob duas grafias (uma com espaço em branco inicial), o que a fazia contar como duas categorias distintas nas tabelas de frequência. Essa inconsistência foi corrigida com `strip()` nas colunas de candidato:
-
-```sas
-data amostra;
-    set amostra;
-    if missing(Timestamp) then delete;   /* descarta linhas vazias (artefato) */
-    id = _n_;
-    presidente = strip(presidente);
-    governador = strip(governador);
-run;
-```
+A coleta foi dividida em três turnos (Manhã, Tarde e Noite), cada um conduzido por um membro/subgrupo da equipe. Antes da análise, foram descartadas 18 linhas totalmente vazias ao final da planilha (artefato da ferramenta de coleta), restando 400 registros válidos.
 
 ## 3.2 População de referência e correção de população finita (fpc)
 
@@ -212,11 +202,11 @@ Fonte: TRE-DF (2026). *Distrito Federal ultrapassa 2,56 milhões de eleitores e 
 
 ## 3.3 Justificativa do tamanho da amostra (n = 400)
 
-Embora os dados já estivessem integralmente coletados, o tamanho de amostra de **n = 400** pessoas pode ser justificado "por engenharia reversa", a partir da margem de erro $e=5\%$ admitida, com confiança de aproximadamente 95% ($Z\approx2$) e cenário de pior caso ($p=0{,}5$, que maximiza a variância):
+O tamanho de amostra de **n = 400** foi justificado a partir da margem de erro $e=5\%$, conforme apresentado abaixo:
 
 $$n_0 = \frac{Z^2\,p(1-p)}{e^2} = \frac{2^2 \times 0{,}5 \times 0{,}5}{0{,}05^2} = \frac{1}{0{,}05^2} = \frac{1}{e^2} = 400$$
 
-O resultado bate **exatamente** com o $n=400$ efetivamente coletado — confirmando que o plano amostral foi dimensionado para uma margem de erro de 5 pontos percentuais, com 95% de confiança, seguindo a regra prática $n_0=1/e^2$ usual em pesquisas eleitorais no Brasil. Esse cálculo foi implementado no SAS como:
+O resultado bate **exatamente** com o $n=400$ efetivamente coletado (confirmando que o plano amostral foi dimensionado para uma margem de erro de 5 pontos percentuais), seguindo a regra prática $n_0=1/e^2$ usual em pesquisas eleitorais no Brasil. Esse cálculo foi implementado no SAS como:
 
 ```sas
 data _null_;
@@ -232,7 +222,7 @@ run;
 
 ## 3.4 Tratamento da não-resposta
 
-Quando um visitante era abordado e recusava participar da pesquisa ("Você quer fazer a pesquisa?" / "Não"), a recusa era documentada fotograficamente em campo. Na base, essa recusa foi registrada sob a categoria **"Sem resposta"** nas perguntas de voto — o que ficou evidente quando, numa revisão da planilha, os 9 respondentes que antes apareciam com a célula literalmente em branco foram recodificados exatamente para esse rótulo. Por isso, **"Sem resposta" é tratada como não-resposta (*missing*)** neste trabalho, e não como uma categoria de voto: ela é conceitualmente diferente de **"Não sei/não quero responder"**, que é uma resposta engajada (a pessoa participou da pesquisa e respondeu à pergunta, só não quis ou não soube nomear um candidato). Misturar as duas confundiria um problema de cobertura da coleta com um achado substantivo sobre indecisão do eleitorado — por isso são tratadas de forma diferente: "Sem resposta" é excluída do cálculo de $\hat p$ e do IC (como qualquer *missing*), e "Não sei/não quero responder" permanece como mais uma categoria de voto válida.
+Quando um visitante era abordado e recusava participar da pesquisa ("Você quer/pode participar a pesquisa?" / "Não"), a recusa foi registrada no formulário. Além disso, essa recusa também foi registrada sob a categoria **"Sem resposta"** nas perguntas de voto. Desta forma, o grupo "Sem resposta" foi excluído do cálculo de $\hat p$ e do IC (como qualquer *missing*), e "Não sei/não quero responder" permaneceu como mais uma categoria de voto válida.
 
 ```sas
 data amostra;
@@ -250,26 +240,22 @@ data amostra;
 run;
 ```
 
-Com isso, a taxa de não-resposta é de **13,25%** (53 de 400) para Presidente e para Governador — os mesmos 53 respondentes recusaram as duas perguntas, sugerindo uma recusa geral em participar dessa parte da pesquisa, não uma dúvida específica sobre um cargo. Há indício de **não-resposta diferencial por sexo**: mulheres recusaram a 15,31% (30 de 196), contra 11,27% dos homens (23 de 204) — uma diferença de 4,04 pontos percentuais, pequena mas não desprezível, que vale mencionar como uma possível fonte leve de viés (sem, no entanto, saber a direção em que isso afetaria as estimativas de voto).
+Com isso, a taxa de não-resposta é de **13,25%** (53 de 400) para Presidente e para Governador (os mesmos 53 respondentes recusaram as duas perguntas, sugerindo uma recusa geral em participar dessa parte da pesquisa, não uma dúvida específica sobre um cargo).
 
 ![Não-resposta por Sexo - Presidente](imagens/imagens_sas/naoresposta_sexo_presidente.png){width=60%}
 
 ## 3.5 Agrupamento de candidatos minoritários nos gráficos ("Outros")
 
-Com 12 a 13 categorias de resposta por cargo (candidatos mais Branco, Nulo e "Não sei/não quero responder"), os gráficos de barra — sobretudo as legendas dos gráficos empilhados da Seção 4.4 — ficavam poluídos e com segmentos minúsculos de difícil leitura. Para simplificar **apenas a visualização**, criou-se a categoria **"Outros"**, que consolida todo candidato cuja votação represente **menos de 1% dos votos válidos** ($n=347$, descontando a não-resposta da Seção 3.4):
+Com 12 a 13 categorias de resposta por cargo (candidatos mais Branco, Nulo e "Não sei/não quero responder"), os gráficos de barra (especialmente as legendas dos gráficos ficavam poluídos e com segmentos minúsculos de difícil leitura). Para simplificar **apenas a visualização**, criou-se a categoria **"Outros"**, que consolida todo candidato cuja votação represente **menos de 1% dos votos válidos** ($n=347$, descontando a não-resposta da Seção 3.4):
 
 - **Presidente:** Edmilson Costa (0,58%), Rui Costa Pimenta (0,29%), Hertz Dias (0,29%) e **Romeu Zema (0,29%)**.
 - **Governador:** Professor Robson (0,58%), Expedito Mendonça (0,29%) e Professora Samara Mineiro (0,29%).
 
-Vale registrar que Romeu Zema recebeu cor própria na paleta de candidatos, mas teve apenas 1 voto na amostra (0,29%) — abaixo do corte de 1%. Por decisão do grupo, o critério foi aplicado **sem exceção**, e Romeu Zema foi incluído em "Outros" junto aos demais candidatos minoritários. Branco, Nulo e "Não sei/não quero responder" **não** entram nesse agrupamento, pois não são candidatos — e, na prática, ficam folgadamente acima de 1% nos dois cargos, então o critério não os afeta. "Sem resposta" nem chega a ser considerada aqui, pois é tratada como não-resposta (Seção 3.4), não como categoria de voto.
-
-Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados. Nos gráficos (gerados em Python — ver Seção 3.6), o sufixo numérico entre parênteses que identificava o candidato no instrumento de coleta (ex.: "Luiz Inácio Lula da Silva (5)") foi removido dos rótulos, para não ser confundido com um valor de votação; o mesmo nome simplificado é usado nas tabelas deste relatório a partir daqui.
-
-Nos gráficos empilhados (Seção 4.4), a ordem da legenda foi fixada assim: primeiro os candidatos nomeados, em **ordem alfabética**; em seguida "Outros"; e por último, em tons de cinza, o bloco de situações de não-voto (Branco, Nulo e Não sei/não quero responder) — separando visualmente quem recebeu um voto de quem não indicou um candidato.
+Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados.
 
 ## 3.6 Geração dos gráficos em Python
 
-Os gráficos de perfil da amostra (Sexo, Faixa Etária, Faixa de Renda, Turno) e de não-resposta foram gerados diretamente no SAS (`PROC SGPLOT`). Já os gráficos de intenção de voto com IC 95% e os cruzamentos por subgrupo (Seção 4.4) — que exigem o agrupamento "Outros", uma paleta de cores fixa por candidato e uma ordem de legenda específica (Seção 3.5) — foram gerados em **Python** (`pandas`, `matplotlib`, `scipy.stats`), no script `script_python/gerar_graficos.py`. O script lê a mesma planilha (`intenções_de_voto_pavilhões.xlsx`), replica a limpeza e as regras de negócio do `trabalho_amostragem.sas` (remoção de linhas vazias, correção de grafia de candidatos, agrupamento "Outros", fórmula de Cochran com divisor $n-1$ e IC via distribuição t de Student) e salva os PNGs usados neste relatório. Essa divisão de responsabilidades foi adotada porque o controle fino de cor, ordenação de legenda e agrupamento de categorias — recursos centrais para a legibilidade dos gráficos mais densos — é bem mais direto de implementar e depurar em Python do que via `PROC FORMAT`/`ATTRMAP` do SAS.
+Os gráficos de perfil da amostra (Sexo, Faixa Etária, Faixa de Renda, Turno) e de não-resposta foram gerados diretamente no SAS (`PROC SGPLOT`). Já os gráficos de intenção de voto com IC 95% e os cruzamentos por subgrupo (Seção 4.4) — que exigem o agrupamento "Outros", uma paleta de cores fixa por candidato e uma ordem de legenda específica (Seção 3.5) — foram gerados em **Python**  no script.
 
 # 4. Análise dos Resultados
 
@@ -299,7 +285,7 @@ Dos 400 respondentes, o perfil demográfico foi (nenhuma variável de perfil tem
 | Turno | Tarde | 16,75% |
 | Turno | Noite | 5,00% |
 
-A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã — isso deve ser mencionado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
+A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã.
 
 ![Distribuição por Sexo](imagens/imagens_sas/perfil_sexo.png){width=70%}
 
@@ -311,7 +297,7 @@ A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etári
 
 ## 4.2 Taxa de resposta
 
-Como detalhado na Seção 3.4, "Sem resposta" é tratada como não-resposta (*missing*) nas perguntas de intenção de voto: a taxa de resposta é de **86,75%** (347 de 400) para Presidente e para Governador — os mesmos 53 respondentes (13,25%) recusaram as duas perguntas. Há indício de não-resposta diferencial por sexo (mulheres 15,31% vs. homens 11,27%), discutido na Seção 3.4.
+Como detalhado na Seção 3.4, "Sem resposta" é tratada como não-resposta (*missing*) nas perguntas de intenção de voto: a taxa de resposta é de **86,75%** (347 de 400) para Presidente e para Governador — os mesmos 53 respondentes (13,25%) recusaram as duas perguntas.
 
 ## 4.3 Estimativas pontuais, erro-padrão e IC 95% (PROC SURVEYFREQ, n válido = 347)
 
