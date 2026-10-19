@@ -201,7 +201,7 @@ A coleta foi dividida em três turnos (Manhã, Tarde e Noite), cada um conduzido
 
 ## 3.2 População de referência e correção de população finita (fpc)
 
-Embora os respondentes abordados nos pavilhões não constituam uma amostra probabilística de todo o eleitorado do Distrito Federal (ver limitações, Seção 5), o tamanho desse eleitorado foi usado para **formalizar, em vez de apenas presumir**, a decisão de omitir a correção de população finita (fpc) nas estimativas de intenção de voto. Segundo o TRE-DF (julho/2026), o Distrito Federal possui $N=2.562.037$ eleitores. Com $n=264$ (n válido para as perguntas de voto, descontando a não-resposta — Seção 3.4 e 4.3), a fração amostral é:
+Salientamos que os respondentes abordados nos pavilhões não constituem uma amostra probabilística de todo o eleitorado do Distrito Federal, o tamanho desse eleitorado foi usado para **formalizar, em vez de apenas presumir**, a decisão de omitir a correção de população finita (fpc) nas estimativas de intenção de voto. Segundo o TRE-DF (julho/2026), o Distrito Federal possui $N=2.562.037$ eleitores. Com $n=264$, a fração amostral é:
 
 $$f = \frac{n}{N} \approx \frac{264}{2.562.037} \approx 0{,}0001030 \;(0{,}0103\%)$$
 
@@ -219,17 +219,17 @@ Fonte: TRE-DF (2026). *Distrito Federal ultrapassa 2,56 milhões de eleitores e 
 
 ## 3.3 Justificativa do tamanho da amostra (n = 400)
 
-Embora os dados já estivessem integralmente coletados, o tamanho de amostra de **n = 400** pessoas pode ser justificado "por engenharia reversa", a partir da margem de erro $e=5\%$ admitida, com confiança de aproximadamente 95% ($Z\approx2$) e cenário de pior caso ($p=0{,}5$, que maximiza a variância):
+Embora os dados já estivessem integralmente coletados, o tamanho de amostra de **n = 400** pessoas pode ser justificado a partir do erro $e=5\%$, conforme apresentado abaixo:
 
 $$n_0 = \frac{Z^2\,p(1-p)}{e^2} = \frac{2^2 \times 0{,}5 \times 0{,}5}{0{,}05^2} = \frac{1}{0{,}05^2} = \frac{1}{e^2} = 400$$
 
-O resultado bate **exatamente** com o $n=400$ efetivamente coletado — confirmando que o plano amostral foi dimensionado para uma margem de erro de 5 pontos percentuais, com 95% de confiança, seguindo a regra prática $n_0=1/e^2$ usual em pesquisas eleitorais no Brasil. Esse cálculo foi implementado no SAS como:
+O resultado bate **exatamente** com o $n=400$ seguindo a regra prática $n_0=1/e^2$ usual em pesquisas eleitorais no Brasil. Esse cálculo foi implementado no SAS como:
 
 ```sas
 data _null_;
-    Z = 2;         /* aproximação usual para 95% de confiança */
-    p = 0.5;       /* cenário de pior caso (variância máxima) */
-    e = 0.05;      /* margem de erro admitida: 5 pontos percentuais */
+    Z = 2;
+    p = 0.5;
+    e = 0.05;
 
     n0 = (Z**2 * p*(1-p)) / (e**2);   /* = 1/e² */
 
@@ -239,7 +239,7 @@ run;
 
 ## 3.4 Tratamento da não-resposta
 
-Quando um visitante era abordado e recusava participar da pesquisa ("Você quer/pode participar da pesquisa?" / "Não"), a recusa era registrada deixando a pergunta de voto **em branco** — diferente de "Não sei/não quero responder", que é uma resposta engajada e válida (a pessoa participou e respondeu, só não quis ou não soube nomear um candidato). Por isso, as células em branco de Presidente/Governador são tratadas como não-resposta (*missing*) e excluídas do cálculo de $\hat p$ e do IC, enquanto "Não sei/não quero responder" permanece como mais uma categoria de voto válida:
+Quando um visitante era abordado e recusava participar da pesquisa ("Você quer/pode participar da pesquisa?" / "Não"), a recusa era registrada deixando a pergunta de voto **em branco(vazio)** no formulário. Por isso, as células em branco de Presidente/Governador são tratadas como não-resposta (*missing*) e excluídas do cálculo de $\hat p$ e do IC, enquanto "Não sei/não quero responder" permanece como mais uma categoria de voto válida:
 
 ```sas
 data amostra;
@@ -257,8 +257,9 @@ data amostra;
     resp_presidente = ifc(missing(presidente), 'Nao respondeu', 'Respondeu');
     resp_governador = ifc(missing(governador), 'Nao respondeu', 'Respondeu');
 run;
+```
 
-Com isso, a taxa de não-resposta é de **34,00%** (136 de 400) para Presidente e para Governador — os mesmos 136 respondentes deixaram as duas perguntas em branco, sugerindo uma recusa geral em participar dessa parte da pesquisa, não uma dúvida específica sobre um cargo. Há indício de **não-resposta diferencial por sexo**, mais acentuado do que em outras variáveis do estudo: mulheres deixaram a pergunta em branco em 37,24% dos casos (73 de 196), contra 30,88% dos homens (63 de 204) — uma diferença de 6,36 pontos percentuais, que reforça a necessidade de cautela ao generalizar os resultados.
+Com isso, a taxa de não-resposta é de **34,00%** (136 de 400) para Presidente e para Governador.
 
 ## 3.5 Agrupamento de candidatos minoritários nos gráficos ("Outros")
 
@@ -356,10 +357,10 @@ Como detalhado na Seção 3.4, respostas em branco são tratadas como não-respo
 | Expedito Mendonça | 0,38 | 0,38 | [0,00 ; 1,12] |
 | Professora Samara Mineiro | 0,38 | 0,38 | [0,00 ; 1,12] |
 
-**Margem de erro nominal (n=400, p=0,5, pior caso):** ±4,91 pontos percentuais\
+**Margem de erro nominal (n=400, p=0,5, nc = 95%, pior caso):** ±4,91 pontos percentuais\
 **Margem de erro efetiva (n válido=264, descontando os 34,00% de não-resposta):** ±6,06 pontos percentuais
 
-> A não-resposta reduziu o n efetivo de 400 para 264, o que **aumentou consideravelmente** a margem de erro, de ±4,91 p.p. para ±6,06 p.p. — um efeito real e substancial (1,15 p.p.), decorrente de uma taxa de não-resposta de 34,00%, muito mais alta que a observada em qualquer outra variável de perfil deste estudo.
+> A não-resposta reduziu o n efetivo de 400 para 264, o que **aumentou consideravelmente** a margem de erro, de ±4,91 p.p. para ±6,06 p.p., resultando em um efeito real e substancial (1,15 p.p.), decorrente de uma taxa de não-resposta de 34,00%.
 
 ![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_sas/voto_presidente_ic.png){width=85%}
 
@@ -403,13 +404,13 @@ Os testes qui-quadrado de associação entre o candidato escolhido e cada variá
 
 # 5. Conclusões
 
-A pesquisa eleitoral conduzida em Brasília, com uma amostra de 400 eleitores coletados por amostragem sistemática (com intervalo $K$ próprio de cada entrevistador, conforme sorteio inicial — Seção 2), permitiu estimar a intenção de voto para Presidente e Governador com margem de erro de aproximadamente ±4,91 pontos percentuais (nominal) e ±6,06 pontos percentuais (efetiva, considerando a não-resposta de 34,00%).
+A pesquisa eleitoral conduzida nos pavilhoes João Calmon e Anisio Teixeira em Brasília, com uma amostra de 400 eleitores coletados por amostragem sistemática (com intervalo $K$ próprio de cada entrevistador, conforme sorteio inicial — Seção 2), permitiu estimar a intenção de voto para Presidente e Governador com margem de erro de aproximadamente ±4,91 pontos percentuais (nominal) e ±6,06 pontos percentuais (efetiva, considerando a não-resposta de 34,00%).
 
 O candidato à Presidência com maior intenção de voto foi **Luiz Inácio Lula da Silva** (61,36%, IC 95%: [55,45%; 67,28%]). Para Governador, o líder foi **Leandro Grass** (56,06%, IC 95%: [50,03%; 62,09%]), com uma parcela expressiva de indecisos ("Não sei/Não quero responder", 12,88%) — diferente de Presidente, em que essa categoria ficou bem menor (3,41%).
 
 A análise por subgrupos indicou que a **faixa etária** é a variável mais associada à intenção de voto para os dois cargos (p<0,0001), enquanto **faixa de renda não mostrou associação significativa** para nenhum dos dois (Presidente p=0,4185; Governador p=0,2712). Para **turno** e para **sexo**, o resultado divergiu entre os cargos em direções opostas: turno foi significativo para Governador (p=0,0047) mas não para Presidente (p=0,0849); sexo foi significativo para Presidente (p=0,0047) mas não para Governador (p=0,4971). Mesmo os resultados significativos devem ser interpretados com cautela, já que a validade do teste é limitada pela baixa contagem esperada em boa parte das células (69% no cruzamento Governador x Turno, 62% em Presidente x Sexo), decorrente do pequeno número de entrevistas no turno da Noite (n=20) e de candidatos minoritários com poucos votos. Recomenda-se tratar esses achados como indícios a serem investigados, não como conclusões definitivas.
 
-Como limitações do estudo, destacam-se: (i) a suposição de tratar o plano sistemático (com $K$ distinto por entrevistador) como equivalente à AAS para fins de cálculo de variância, válida apenas na ausência de periodicidade na ordem de chegada dos entrevistados — e a necessidade de confirmar junto à equipe se o $K$ de cada entrevistador (Seção 2) foi de fato respeitado em campo, já que um $K$ divergente do sorteado introduziria um viés de seleção não capturado pelas fórmulas de variância usadas; (ii) a forte concentração da amostra no turno da manhã (78,25%) e na faixa etária de 19 a 24 anos (49,00%), que limita a representatividade do levantamento em relação ao eleitorado geral da cidade; e (iii) a **não-resposta de 34,00% nas perguntas de voto** — bem mais alta que em qualquer outra variável do estudo —, que reduz consideravelmente o n efetivo e aumenta a margem de erro, com indício de não-resposta diferencial por sexo (mulheres 37,24% vs. homens 30,88% — Seção 3.4), o que é um ponto de atenção relevante para a validade externa das estimativas. A inconsistência de digitação anteriormente identificada no candidato "Samara Martins" (duas grafias distintas) foi corrigida no tratamento dos dados (Seção 3.1).
+Como limitações do estudo, destacam-se: (i) a **não-resposta de 34,00% nas perguntas de voto** — bem mais alta que em qualquer outra variável do estudo —, que reduz consideravelmente o n efetivo e aumenta a margem de erro, com indício de não-resposta diferencial por sexo (mulheres 37,24% vs. homens 30,88% — Seção 3.4), o que é um ponto de atenção relevante para a validade externa das estimativas.
 
 # Referências {.unnumbered}
 
