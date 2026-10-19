@@ -253,9 +253,9 @@ Com 12 a 13 categorias de resposta por cargo (candidatos mais Branco, Nulo e "N�
 
 Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados.
 
-## 3.6 Geração dos gráficos em Python
+## 3.6 Geração dos gráficos no SAS
 
-Os gráficos de perfil da amostra (Sexo, Faixa Etária, Faixa de Renda, Turno) e de não-resposta foram gerados diretamente no SAS (`PROC SGPLOT`). Já os gráficos de intenção de voto com IC 95% e os cruzamentos por subgrupo (Seção 4.4) — que exigem o agrupamento "Outros", uma paleta de cores fixa por candidato e uma ordem de legenda específica (Seção 3.5) — foram gerados em **Python**  no script.
+Todos os gráficos deste relatório — perfil da amostra, não-resposta, intenção de voto com IC 95% e os cruzamentos por subgrupo (Seção 4.4) — são gerados diretamente no SAS, via `PROC SGPLOT`, no script `script_sas/trabalho_amostragem.sas`. O agrupamento "Outros" (Seção 3.5) é calculado por uma macro genérica (`%agrupar_outros`) que relê as contagens de cada candidato a cada execução, e a paleta de cores fixa por candidato — com ordem de legenda específica (candidatos em ordem alfabética, depois "Outros", depois o bloco de não-voto em tons de cinza) — é definida via `ATTRMAP`, aplicada por três macros reutilizáveis: `%grafico_perfil` (barras de perfil), `%grafico_ic` (intenção de voto com IC 95%) e `%grafico_empilhado` (cruzamentos por subgrupo, barras empilhadas a 100%). Essa consolidação em um único script elimina a necessidade de uma etapa externa em Python para a geração dos gráficos.
 
 # 4. Análise dos Resultados
 
@@ -341,16 +341,18 @@ Como detalhado na Seção 3.4, respostas em branco são tratadas como não-respo
 
 > A não-resposta reduziu o n efetivo de 400 para 264, o que **aumentou consideravelmente** a margem de erro, de ±4,91 p.p. para ±6,06 p.p. — um efeito real e substancial (1,15 p.p.), decorrente de uma taxa de não-resposta de 34,00%, muito mais alta que a observada em qualquer outra variável de perfil deste estudo.
 
-![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_python/voto_presidente_ic.png){width=85%}
+![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_sas/voto_presidente_ic.png){width=85%}
 
-![Intenção de voto - Governador (%) com IC 95%](imagens/imagens_python/voto_governador_ic.png){width=85%}
+![Intenção de voto - Governador (%) com IC 95%](imagens/imagens_sas/voto_governador_ic.png){width=85%}
 
-## 4.4 Análise por subgrupos (Turno, Faixa Etária, Faixa de Renda)
+## 4.4 Análise por subgrupos (Sexo, Turno, Faixa Etária, Faixa de Renda)
 
 Os testes qui-quadrado de associação entre o candidato escolhido e cada variável de perfil indicaram:
 
 | Cruzamento | Qui-quadrado (GL) | p-valor | Observação |
 |---|---|---|---|
+| Presidente x Sexo | 28,50 (12) | **0,0047** | 62% das células com contagem esperada <5 — teste pode não ser válido |
+| Governador x Sexo | 10,37 (11) | 0,4971 | 58% das células com contagem esperada <5 — não significativo |
 | Presidente x Faixa de Renda | 61,60 (60) | 0,4185 | 86% das células com contagem esperada <5 — não significativo |
 | Presidente x Faixa Etária | 199,50 (84) | <0,0001 | 89% das células com contagem esperada <5 — teste pode não ser válido |
 | Presidente x Turno | 33,99 (24) | 0,0849 | 74% das células com contagem esperada <5 — não significativo |
@@ -358,21 +360,26 @@ Os testes qui-quadrado de associação entre o candidato escolhido e cada variá
 | Governador x Faixa Etária | 143,66 (77) | <0,0001 | 89% das células com contagem esperada <5 — teste pode não ser válido |
 | Governador x Turno | 43,02 (22) | **0,0047** | 69% das células com contagem esperada <5 — teste pode não ser válido |
 
+- **Sexo:** resultado também diferente entre os dois cargos. Para **Presidente**, o teste qui-quadrado indicou associação estatisticamente significativa entre sexo e candidato escolhido (p=0,0047). Para **Governador**, não houve evidência de associação (p=0,4971). Como em 62% das células a contagem esperada é menor que 5 (reflexo dos candidatos minoritários terem poucos votos), o resultado de Presidente deve ser lido como indício, não como conclusão definitiva.
 - **Faixa de renda:** diferente do que se observava antes do tratamento da não-resposta desta versão da base, o cruzamento **deixou de ser estatisticamente significativo** para os dois cargos (Presidente p=0,4185; Governador p=0,2712). Ou seja, não há evidência, nesta amostra, de que a faixa de renda esteja associada ao candidato escolhido.
 - **Faixa etária:** continua fortemente significativa para os dois cargos (p<0,0001), mas sofre de forte esparsidade (89% das células com contagem esperada <5 em ambos), dado o grande número de categorias de candidatos combinado com faixas pouco povoadas (ex.: 35 a 39 anos tem apenas 2 respondentes no total). A leitura qualitativa dos gráficos é mais confiável que o p-valor nesse caso.
 - **Turno:** o resultado foi diferente entre os dois cargos. Para **Governador**, o teste qui-quadrado indicou diferença estatisticamente significativa na intenção de voto entre os turnos (p=0,0047). Para **Presidente**, não houve evidência de associação (p=0,0849), embora mais próxima do limiar de 5% do que antes do tratamento da não-resposta. **Importante:** em ambos os cruzamentos, o próprio SAS alerta que mais de 2/3 das células têm contagem esperada menor que 5 (reflexo do turno Noite ter apenas 20 respondentes e dos candidatos minoritários terem poucas respostas) — isso torna o teste qui-quadrado estatisticamente pouco confiável nesses cruzamentos, e deve ser mencionado como limitação ao relatar esses resultados, inclusive o único que deu significativo (Governador x Turno), não como conclusão definitiva.
 
-![Presidente por Faixa de Renda (% dentro de cada faixa)](imagens/imagens_python/presidente_por_renda.png){width=85%}
+![Presidente por Sexo (% dentro de cada sexo)](imagens/imagens_sas/presidente_por_sexo.png){width=80%}
 
-![Presidente por Faixa Etária (% dentro de cada faixa)](imagens/imagens_python/presidente_por_etaria.png){width=85%}
+![Governador por Sexo (% dentro de cada sexo)](imagens/imagens_sas/governador_por_sexo.png){width=80%}
 
-![Presidente por Turno (% dentro de cada turno)](imagens/imagens_python/presidente_por_turno.png){width=80%}
+![Presidente por Faixa de Renda (% dentro de cada faixa)](imagens/imagens_sas/presidente_por_renda.png){width=85%}
 
-![Governador por Faixa de Renda (% dentro de cada faixa)](imagens/imagens_python/governador_por_renda.png){width=85%}
+![Presidente por Faixa Etária (% dentro de cada faixa)](imagens/imagens_sas/presidente_por_etaria.png){width=85%}
 
-![Governador por Faixa Etária (% dentro de cada faixa)](imagens/imagens_python/governador_por_etaria.png){width=85%}
+![Presidente por Turno (% dentro de cada turno)](imagens/imagens_sas/presidente_por_turno.png){width=80%}
 
-![Governador por Turno (% dentro de cada turno)](imagens/imagens_python/governador_por_turno.png){width=80%}
+![Governador por Faixa de Renda (% dentro de cada faixa)](imagens/imagens_sas/governador_por_renda.png){width=85%}
+
+![Governador por Faixa Etária (% dentro de cada faixa)](imagens/imagens_sas/governador_por_etaria.png){width=85%}
+
+![Governador por Turno (% dentro de cada turno)](imagens/imagens_sas/governador_por_turno.png){width=80%}
 
 # 5. Conclusões
 
@@ -380,7 +387,7 @@ A pesquisa eleitoral conduzida em Brasília, com uma amostra de 400 eleitores co
 
 O candidato à Presidência com maior intenção de voto foi **Luiz Inácio Lula da Silva** (61,36%, IC 95%: [55,45%; 67,28%]). Para Governador, o líder foi **Leandro Grass** (56,06%, IC 95%: [50,03%; 62,09%]), com uma parcela expressiva de indecisos ("Não sei/Não quero responder", 12,88%) — diferente de Presidente, em que essa categoria ficou bem menor (3,41%).
 
-A análise por subgrupos indicou que a **faixa etária** é a variável mais associada à intenção de voto para os dois cargos (p<0,0001), enquanto **faixa de renda não mostrou associação significativa** para nenhum dos dois (Presidente p=0,4185; Governador p=0,2712). Para **turno**, o resultado divergiu entre os cargos: significativo para Governador (p=0,0047), não significativo para Presidente (p=0,0849). Mesmo o resultado significativo deve ser interpretado com cautela, já que a validade do teste é limitada pela baixa contagem esperada em boa parte das células (69% das células no cruzamento Governador x Turno), decorrente do pequeno número de entrevistas no turno da Noite (n=20). Recomenda-se tratar esse achado como indício a ser investigado, não como conclusão definitiva.
+A análise por subgrupos indicou que a **faixa etária** é a variável mais associada à intenção de voto para os dois cargos (p<0,0001), enquanto **faixa de renda não mostrou associação significativa** para nenhum dos dois (Presidente p=0,4185; Governador p=0,2712). Para **turno** e para **sexo**, o resultado divergiu entre os cargos em direções opostas: turno foi significativo para Governador (p=0,0047) mas não para Presidente (p=0,0849); sexo foi significativo para Presidente (p=0,0047) mas não para Governador (p=0,4971). Mesmo os resultados significativos devem ser interpretados com cautela, já que a validade do teste é limitada pela baixa contagem esperada em boa parte das células (69% no cruzamento Governador x Turno, 62% em Presidente x Sexo), decorrente do pequeno número de entrevistas no turno da Noite (n=20) e de candidatos minoritários com poucos votos. Recomenda-se tratar esses achados como indícios a serem investigados, não como conclusões definitivas.
 
 Como limitações do estudo, destacam-se: (i) a suposição de tratar o plano sistemático (K=5) como equivalente à AAS para fins de cálculo de variância, válida apenas na ausência de periodicidade na ordem de chegada dos entrevistados; (ii) a forte concentração da amostra no turno da manhã (78,25%) e na faixa etária de 19 a 24 anos (49,00%), que limita a representatividade do levantamento em relação ao eleitorado geral da cidade; e (iii) a **não-resposta de 34,00% nas perguntas de voto** — bem mais alta que em qualquer outra variável do estudo —, que reduz consideravelmente o n efetivo e aumenta a margem de erro, com indício de não-resposta diferencial por sexo (mulheres 37,24% vs. homens 30,88% — Seção 3.4), o que é um ponto de atenção relevante para a validade externa das estimativas. A inconsistência de digitação anteriormente identificada no candidato "Samara Martins" (duas grafias distintas) foi corrigida no tratamento dos dados (Seção 3.1).
 
