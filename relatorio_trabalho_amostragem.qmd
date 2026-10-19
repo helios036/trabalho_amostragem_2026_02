@@ -56,7 +56,7 @@ Marcos Well Neres Silva Pereira\\
 
 # Resumo
 
-As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática (K=5) tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, e o efeito da não-resposta (34% — respondentes que deixaram a pergunta de voto em branco) sobre a margem de erro foi quantificado. O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (61,36%, IC 95%: [55,45%; 67,28%]) e Leandro Grass para Governador (56,06%, IC 95%: [50,03%; 62,09%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto principalmente em função da faixa etária (p<0,0001 para os dois cargos); a associação com turno de coleta só foi significativa para Governador, e a associação com faixa de renda não foi significativa para nenhum dos dois cargos — com ressalvas quanto à validade do teste qui-quadrado em todos os cruzamentos dado o pequeno número de observações esperadas em boa parte das células.
+As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática (com intervalo $K$ definido por sorteio individual de cada entrevistador — Seção 2) tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, e o efeito da não-resposta (34% — respondentes que deixaram a pergunta de voto em branco) sobre a margem de erro foi quantificado. O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (61,36%, IC 95%: [55,45%; 67,28%]) e Leandro Grass para Governador (56,06%, IC 95%: [50,03%; 62,09%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto principalmente em função da faixa etária (p<0,0001 para os dois cargos); a associação com turno de coleta só foi significativa para Governador, e a associação com faixa de renda não foi significativa para nenhum dos dois cargos — com ressalvas quanto à validade do teste qui-quadrado em todos os cruzamentos dado o pequeno número de observações esperadas em boa parte das células.
 
 **Palavras-chave:** amostragem, amostragem sistemática, pesquisa eleitoral, intervalo de confiança, margem de erro, não-resposta.
 
@@ -167,10 +167,6 @@ A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por
 
 ![Local de coleta — pavilhão na UnB](imagens/imagens_coleta/local_coleta_unb.jpeg){width=70%}
 
-
-<!--
-
-
 ```{=latex}
 \begin{center}
 \begin{minipage}{0.48\textwidth}
@@ -200,7 +196,6 @@ A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por
 \end{minipage}
 \end{center}
 ```
--->
 
 A coleta foi dividida em três turnos (Manhã, Tarde e Noite), cada um conduzido por um membro/subgrupo da equipe, totalizando 400 registros válidos.
 
@@ -265,18 +260,6 @@ run;
 
 Com isso, a taxa de não-resposta é de **34,00%** (136 de 400) para Presidente e para Governador — os mesmos 136 respondentes deixaram as duas perguntas em branco, sugerindo uma recusa geral em participar dessa parte da pesquisa, não uma dúvida específica sobre um cargo. Há indício de **não-resposta diferencial por sexo**, mais acentuado do que em outras variáveis do estudo: mulheres deixaram a pergunta em branco em 37,24% dos casos (73 de 196), contra 30,88% dos homens (63 de 204) — uma diferença de 6,36 pontos percentuais, que reforça a necessidade de cautela ao generalizar os resultados.
 
-```sas
-data amostra;
-    set amostra;
-    resp_presidente = ifc(missing(presidente), 'Nao respondeu', 'Respondeu');
-    resp_governador = ifc(missing(governador), 'Nao respondeu', 'Respondeu');
-run;
-
-proc surveyfreq data=amostra order=freq total=&N_DF.;
-    tables presidente / cl;
-run;
-```
-
 ## 3.5 Agrupamento de candidatos minoritários nos gráficos ("Outros")
 
 Com 12 a 13 categorias de resposta por cargo (candidatos mais Branco, Nulo e "Não sei/não quero responder"), os gráficos de barra (especialmente as legendas dos gráficos ficavam poluídos e com segmentos minúsculos de difícil leitura). Para simplificar **apenas a visualização**, criou-se a categoria **"Outros"**, que consolida todo candidato cuja votação represente **menos de 1% dos votos válidos** ($n=264$, descontando a não-resposta da Seção 3.4):
@@ -284,9 +267,9 @@ Com 12 a 13 categorias de resposta por cargo (candidatos mais Branco, Nulo e "N�
 - **Presidente:** Edmilson Costa (0,76%), Rui Costa Pimenta (0,38%), Hertz Dias (0,38%) e **Romeu Zema (0,38%)**.
 - **Governador:** Professor Robson (0,76%), Expedito Mendonça (0,38%) e Professora Samara Mineiro (0,38%).
 
-Vale registrar que Romeu Zema recebeu cor própria na paleta de candidatos, mas teve apenas 1 voto na amostra (0,25%) — abaixo do corte de 1%. Por decisão do grupo, o critério foi aplicado **sem exceção**, e Romeu Zema foi incluído em "Outros" junto aos demais candidatos minoritários. Branco, Nulo, "Sem resposta" e "Não sei/não quero responder" **não** entram nesse agrupamento, pois não são candidatos — e, na prática, todos ficam folgadamente acima de 1% nos dois cargos, então o critério não os afeta.
+Branco, Nulo e "Não sei/não quero responder" **não** entram nesse agrupamento, pois não são candidatos — e, na prática, todos ficam folgadamente acima de 1% nos dois cargos, então o critério não os afeta.
 
-Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados. Nos gráficos (gerados em Python — ver Seção 3.6), o sufixo numérico entre parênteses que identificava o candidato no instrumento de coleta (ex.: "Luiz Inácio Lula da Silva (5)") foi removido dos rótulos, para não ser confundido com um valor de votação; o mesmo nome simplificado é usado nas tabelas deste relatório a partir daqui.
+Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados. Nos gráficos (gerados no SAS — ver Seção 3.6), o sufixo numérico entre parênteses que identificava o candidato no instrumento de coleta (ex.: "Luiz Inácio Lula da Silva (5)") foi removido dos rótulos, para não ser confundido com um valor de votação; o mesmo nome simplificado é usado nas tabelas deste relatório a partir daqui.
 
 Nos gráficos empilhados (Seção 4.4), a ordem da legenda foi fixada assim: primeiro os candidatos nomeados, em **ordem alfabética**; em seguida "Outros"; e por último, em tons de cinza, o bloco de situações de não-voto (Branco, Nulo, Sem resposta e Não sei/não quero responder) — separando visualmente quem recebeu um voto de quem não indicou um candidato.
 
@@ -420,13 +403,13 @@ Os testes qui-quadrado de associação entre o candidato escolhido e cada variá
 
 # 5. Conclusões
 
-A pesquisa eleitoral conduzida em Brasília, com uma amostra de 400 eleitores coletados por amostragem sistemática (K=5), permitiu estimar a intenção de voto para Presidente e Governador com margem de erro de aproximadamente ±4,91 pontos percentuais (nominal) e ±6,06 pontos percentuais (efetiva, considerando a não-resposta de 34,00%).
+A pesquisa eleitoral conduzida em Brasília, com uma amostra de 400 eleitores coletados por amostragem sistemática (com intervalo $K$ próprio de cada entrevistador, conforme sorteio inicial — Seção 2), permitiu estimar a intenção de voto para Presidente e Governador com margem de erro de aproximadamente ±4,91 pontos percentuais (nominal) e ±6,06 pontos percentuais (efetiva, considerando a não-resposta de 34,00%).
 
 O candidato à Presidência com maior intenção de voto foi **Luiz Inácio Lula da Silva** (61,36%, IC 95%: [55,45%; 67,28%]). Para Governador, o líder foi **Leandro Grass** (56,06%, IC 95%: [50,03%; 62,09%]), com uma parcela expressiva de indecisos ("Não sei/Não quero responder", 12,88%) — diferente de Presidente, em que essa categoria ficou bem menor (3,41%).
 
 A análise por subgrupos indicou que a **faixa etária** é a variável mais associada à intenção de voto para os dois cargos (p<0,0001), enquanto **faixa de renda não mostrou associação significativa** para nenhum dos dois (Presidente p=0,4185; Governador p=0,2712). Para **turno** e para **sexo**, o resultado divergiu entre os cargos em direções opostas: turno foi significativo para Governador (p=0,0047) mas não para Presidente (p=0,0849); sexo foi significativo para Presidente (p=0,0047) mas não para Governador (p=0,4971). Mesmo os resultados significativos devem ser interpretados com cautela, já que a validade do teste é limitada pela baixa contagem esperada em boa parte das células (69% no cruzamento Governador x Turno, 62% em Presidente x Sexo), decorrente do pequeno número de entrevistas no turno da Noite (n=20) e de candidatos minoritários com poucos votos. Recomenda-se tratar esses achados como indícios a serem investigados, não como conclusões definitivas.
 
-Como limitações do estudo, destacam-se: (i) a suposição de tratar o plano sistemático (K=5) como equivalente à AAS para fins de cálculo de variância, válida apenas na ausência de periodicidade na ordem de chegada dos entrevistados; (ii) a forte concentração da amostra no turno da manhã (78,25%) e na faixa etária de 19 a 24 anos (49,00%), que limita a representatividade do levantamento em relação ao eleitorado geral da cidade; e (iii) a **não-resposta de 34,00% nas perguntas de voto** — bem mais alta que em qualquer outra variável do estudo —, que reduz consideravelmente o n efetivo e aumenta a margem de erro, com indício de não-resposta diferencial por sexo (mulheres 37,24% vs. homens 30,88% — Seção 3.4), o que é um ponto de atenção relevante para a validade externa das estimativas. A inconsistência de digitação anteriormente identificada no candidato "Samara Martins" (duas grafias distintas) foi corrigida no tratamento dos dados (Seção 3.1).
+Como limitações do estudo, destacam-se: (i) a suposição de tratar o plano sistemático (com $K$ distinto por entrevistador) como equivalente à AAS para fins de cálculo de variância, válida apenas na ausência de periodicidade na ordem de chegada dos entrevistados — e a necessidade de confirmar junto à equipe se o $K$ de cada entrevistador (Seção 2) foi de fato respeitado em campo, já que um $K$ divergente do sorteado introduziria um viés de seleção não capturado pelas fórmulas de variância usadas; (ii) a forte concentração da amostra no turno da manhã (78,25%) e na faixa etária de 19 a 24 anos (49,00%), que limita a representatividade do levantamento em relação ao eleitorado geral da cidade; e (iii) a **não-resposta de 34,00% nas perguntas de voto** — bem mais alta que em qualquer outra variável do estudo —, que reduz consideravelmente o n efetivo e aumenta a margem de erro, com indício de não-resposta diferencial por sexo (mulheres 37,24% vs. homens 30,88% — Seção 3.4), o que é um ponto de atenção relevante para a validade externa das estimativas. A inconsistência de digitação anteriormente identificada no candidato "Samara Martins" (duas grafias distintas) foi corrigida no tratamento dos dados (Seção 3.1).
 
 # Referências {.unnumbered}
 
