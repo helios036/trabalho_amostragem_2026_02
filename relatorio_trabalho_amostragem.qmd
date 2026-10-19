@@ -23,6 +23,7 @@ format:
     include-in-header:
       text: |
         \let\maketitle\relax
+        \usepackage{booktabs}
 ---
 
 ```{=latex}
@@ -49,6 +50,8 @@ Marcos Well Neres Silva Pereira\\
 \renewcommand{\contentsname}{Sumário}
 \tableofcontents
 \newpage
+
+
 ```
 
 # Resumo
@@ -65,7 +68,7 @@ No Brasil, esse papel das pesquisas eleitorais ganha relevância em períodos de
 
 Em Brasília, esse cenário se expressa na disputa pelos cargos de Presidente da República e Governador do Distrito Federal, ambos decididos no mesmo pleito. Nesse contexto, conduziu-se uma pesquisa eleitoral presencial na cidade, com coleta de dados realizada junto a visitantes de pavilhões João Calmon e Anísio Teixeira, por meio de um plano amostral sistemático que buscou garantir representatividade ao longo de diferentes turnos do dia (manhã, tarde e noite).
 
-Para tanto, foram abordadas 400 pessoas nos pavilhões Anísio Teixeira e João Calmon por meio de amostragem sistemática (K=5), com início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência de chegada ao pavilhão. Em cada abordagem, registrou-se o sexo, a faixa etária, a faixa de renda familiar, o turno da coleta e a intenção de voto para Presidente e Governador, sendo os casos de recusa tratados como não-resposta.
+Para tanto, foram abordadas 400 pessoas nos pavilhões Anísio Teixeira e João Calmon por meio de amostragem sistemática, com início aleatório sorteado entre a 1ª e a kª pessoa da sequência de chegada ao pavilhão. Em cada abordagem, registrou-se o sexo, a faixa etária, a faixa de renda familiar, o turno da coleta e a intenção de voto para Presidente e Governador, sendo os casos de recusa tratados como não-resposta.
 
 ## 1.1 Objetivos
 
@@ -80,7 +83,21 @@ Os objetivos específicos são:
 
 # 2. Referencial Teórico
 
-A coleta foi conduzida por **amostragem sistemática**, com intervalo $K=5$: a cada 5 pessoas que passavam pelos pavilhões, 1 era abordada, com início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência. Para fins de estimação de variância e erro-padrão, a amostragem sistemática foi tratada de forma equivalente à Amostragem Aleatória Simples sem reposição (AASs) — prática padrão quando a população está em "ordem aleatória" (ausência de periodicidade ou tendência), como justificado por Cochran (1977) e Bolfarine & Bussab (2004).
+A coleta de dados foi conduzida por meio de **amostragem sistemática**, utilizando um intervalo de seleção \(K=k\). Nesse procedimento, a cada \(k\) pessoas que passavam pelos pavilhões, uma era selecionada para participar da pesquisa. O processo teve início a partir de um ponto aleatório, definido por sorteio entre a 1ª e a \(k\)-ésima pessoa da sequência.
+
+O ponto inicial de cada entrevistador foi determinado a partir dos números aleatórios fornecidos pelo professor no início da disciplina, conforme apresentado na tabela a seguir:
+
+
+| Entrevistador | Número aleatório |
+|:--------------|-----------------:|
+| Caroline      | 1                |
+| Helio         | 5                |
+| Karine        | 8                |
+| Marcos Well   | 10               |
+
+
+
+Para fins de **estimação da variância e do erro-padrão**, a amostragem sistemática foi tratada como equivalente à **Amostragem Aleatória Simples sem reposição (AASs)**. Essa aproximação é adequada quando a população pode ser considerada em **ordem aleatória**, isto é, quando não há evidências de periodicidade, tendência ou outro padrão sistemático associado à variável de interesse. Essa abordagem é discutida na literatura clássica de amostragem, conforme Cochran (1977) e Bolfarine e Bussab (2004).
 
 ## 2.1 Notação e parâmetros populacionais
 
@@ -134,11 +151,11 @@ Considerando uma população com $N$ elementos ordenados de 1 a $N$, com $N=kn$ 
 
 $$\text{elementos selecionados} = r,\ r+k,\ r+2k,\ \dots,\ r+(n-1)k$$
 
-Neste trabalho, $k=K=5$. Cochran (1977, Seção 8.2) mostra que a amostragem sistemática equivale à seleção aleatória de **um único conglomerado** dentre $k$ conglomerados possíveis (cada um com $n$ unidades), de modo que sua variância verdadeira é:
+Neste trabalho, $k=K$. Cochran (1977, Seção 8.2) mostra que a amostragem sistemática equivale à seleção aleatória de **um único conglomerado** dentre $k$ conglomerados possíveis (cada um com $n$ unidades), de modo que sua variância verdadeira é:
 
 $$V(\bar{y}_{sis}) = \frac{N-1}{N}S^2 - \frac{k(n-1)}{N}S^2_{wsy}$$
 
-(Cochran, 1977, Teorema 8.1; equivalentemente, Bolfarine & Bussab, 2004, Eq. 7.6–7.8, em termos do coeficiente de correlação intraclasse $\rho_{int}$: $V_k=\{1+\rho_{int}(n-1)\}\,\sigma^2/n$). Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004, Eq. 7.7; Corolário 3.5). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=5$) como equivalente à da AASs.
+(Cochran, 1977, Teorema 8.1; equivalentemente, Bolfarine & Bussab, 2004, Eq. 7.6–7.8, em termos do coeficiente de correlação intraclasse $\rho_{int}$: $V_k=\{1+\rho_{int}(n-1)\}\,\sigma^2/n$). Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004, Eq. 7.7; Corolário 3.5). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=k$) como equivalente à da AASs.
 
 # 3. Materiais e Métodos
 
@@ -146,9 +163,13 @@ Toda a análise estatística deste trabalho foi conduzida no **software SAS**, u
 
 ## 3.1 Local e procedimento de coleta
 
-A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo foi a **amostragem sistemática com $K=5$**: a cada 5 pessoas que passavam pelo local, 1 era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência de chegada.
+A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo foi a **amostragem sistemática com $K=k$**: a cada k pessoas que passavam pelo local, 1 era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a kª pessoa da sequência de chegada.
 
 ![Local de coleta — pavilhão na UnB](imagens/imagens_coleta/local_coleta_unb.jpeg){width=70%}
+
+
+<!--
+
 
 ```{=latex}
 \begin{center}
@@ -179,6 +200,7 @@ A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por
 \end{minipage}
 \end{center}
 ```
+-->
 
 A coleta foi dividida em três turnos (Manhã, Tarde e Noite), cada um conduzido por um membro/subgrupo da equipe, totalizando 400 registros válidos.
 
@@ -202,11 +224,11 @@ Fonte: TRE-DF (2026). *Distrito Federal ultrapassa 2,56 milhões de eleitores e 
 
 ## 3.3 Justificativa do tamanho da amostra (n = 400)
 
-O tamanho de amostra de **n = 400** foi justificado a partir da margem de erro $e=5\%$, conforme apresentado abaixo:
+Embora os dados já estivessem integralmente coletados, o tamanho de amostra de **n = 400** pessoas pode ser justificado "por engenharia reversa", a partir da margem de erro $e=5\%$ admitida, com confiança de aproximadamente 95% ($Z\approx2$) e cenário de pior caso ($p=0{,}5$, que maximiza a variância):
 
 $$n_0 = \frac{Z^2\,p(1-p)}{e^2} = \frac{2^2 \times 0{,}5 \times 0{,}5}{0{,}05^2} = \frac{1}{0{,}05^2} = \frac{1}{e^2} = 400$$
 
-O resultado bate **exatamente** com o $n=400$ efetivamente coletado (confirmando que o plano amostral foi dimensionado para uma margem de erro de 5 pontos percentuais), seguindo a regra prática $n_0=1/e^2$ usual em pesquisas eleitorais no Brasil. Esse cálculo foi implementado no SAS como:
+O resultado bate **exatamente** com o $n=400$ efetivamente coletado — confirmando que o plano amostral foi dimensionado para uma margem de erro de 5 pontos percentuais, com 95% de confiança, seguindo a regra prática $n_0=1/e^2$ usual em pesquisas eleitorais no Brasil. Esse cálculo foi implementado no SAS como:
 
 ```sas
 data _null_;
@@ -240,9 +262,20 @@ data amostra;
     resp_presidente = ifc(missing(presidente), 'Nao respondeu', 'Respondeu');
     resp_governador = ifc(missing(governador), 'Nao respondeu', 'Respondeu');
 run;
-```
 
 Com isso, a taxa de não-resposta é de **34,00%** (136 de 400) para Presidente e para Governador — os mesmos 136 respondentes deixaram as duas perguntas em branco, sugerindo uma recusa geral em participar dessa parte da pesquisa, não uma dúvida específica sobre um cargo. Há indício de **não-resposta diferencial por sexo**, mais acentuado do que em outras variáveis do estudo: mulheres deixaram a pergunta em branco em 37,24% dos casos (73 de 196), contra 30,88% dos homens (63 de 204) — uma diferença de 6,36 pontos percentuais, que reforça a necessidade de cautela ao generalizar os resultados.
+
+```sas
+data amostra;
+    set amostra;
+    resp_presidente = ifc(missing(presidente), 'Nao respondeu', 'Respondeu');
+    resp_governador = ifc(missing(governador), 'Nao respondeu', 'Respondeu');
+run;
+
+proc surveyfreq data=amostra order=freq total=&N_DF.;
+    tables presidente / cl;
+run;
+```
 
 ## 3.5 Agrupamento de candidatos minoritários nos gráficos ("Outros")
 
@@ -251,7 +284,11 @@ Com 12 a 13 categorias de resposta por cargo (candidatos mais Branco, Nulo e "N�
 - **Presidente:** Edmilson Costa (0,76%), Rui Costa Pimenta (0,38%), Hertz Dias (0,38%) e **Romeu Zema (0,38%)**.
 - **Governador:** Professor Robson (0,76%), Expedito Mendonça (0,38%) e Professora Samara Mineiro (0,38%).
 
-Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados.
+Vale registrar que Romeu Zema recebeu cor própria na paleta de candidatos, mas teve apenas 1 voto na amostra (0,25%) — abaixo do corte de 1%. Por decisão do grupo, o critério foi aplicado **sem exceção**, e Romeu Zema foi incluído em "Outros" junto aos demais candidatos minoritários. Branco, Nulo, "Sem resposta" e "Não sei/não quero responder" **não** entram nesse agrupamento, pois não são candidatos — e, na prática, todos ficam folgadamente acima de 1% nos dois cargos, então o critério não os afeta.
+
+Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados. Nos gráficos (gerados em Python — ver Seção 3.6), o sufixo numérico entre parênteses que identificava o candidato no instrumento de coleta (ex.: "Luiz Inácio Lula da Silva (5)") foi removido dos rótulos, para não ser confundido com um valor de votação; o mesmo nome simplificado é usado nas tabelas deste relatório a partir daqui.
+
+Nos gráficos empilhados (Seção 4.4), a ordem da legenda foi fixada assim: primeiro os candidatos nomeados, em **ordem alfabética**; em seguida "Outros"; e por último, em tons de cinza, o bloco de situações de não-voto (Branco, Nulo, Sem resposta e Não sei/não quero responder) — separando visualmente quem recebeu um voto de quem não indicou um candidato.
 
 ## 3.6 Geração dos gráficos no SAS
 
@@ -285,7 +322,7 @@ Dos 400 respondentes, o perfil demográfico foi (as células em branco de Faixa 
 | Turno | Tarde | 16,75% |
 | Turno | Noite | 5,00% |
 
-A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã.
+A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã — isso deve ser mencionado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
 
 ![Distribuição por Sexo](imagens/imagens_sas/perfil_sexo.png){width=70%}
 
