@@ -63,7 +63,7 @@ ods graphics on / width=800px height=500px imagefmt=png reset=all;
    1. IMPORTAÇÃO DA AMOSTRA
    ------------------------------------------------------------------------- */
 proc import out=amostra_raw
-    datafile="/home/helios_0190/intenções_de_voto_pavilhões_v2.xlsx"
+    datafile="/home/u64542467/trabalho_amostragem_2026_2/intenções_de_voto_pavilhões.xlsx"
     dbms=xlsx replace;
     getnames=yes;
 run;
@@ -571,7 +571,7 @@ data attrmap;
 run;
 
 /* Cor única dos gráficos de perfil (não envolvem candidatos) */
-%let cor_neutra = CX3B6FA0;
+%let cor_neutra = #C0CFE5;
 
 /* =========================================================================
    11. MACROS DE GRÁFICO
@@ -627,7 +627,7 @@ run;
         rename &grp. = categoria;
     run;
 
-    proc sort data=_ic; by pct; run;   /* maior no topo do gráfico */
+    proc sort data=_ic; by pct; by descending pct; run;   /* maior no topo do gráfico */
 
     ods graphics / reset=index imagename="&nome." width=900px height=600px;
     title1 bold "&titulo.";

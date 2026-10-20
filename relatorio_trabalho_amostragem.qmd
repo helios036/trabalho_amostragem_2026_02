@@ -51,12 +51,11 @@ Marcos Well Neres Silva Pereira\\
 \tableofcontents
 \newpage
 
-
 ```
 
 # Resumo
 
-As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, e o efeito da não-resposta (34% respondentes que deixaram a pergunta de voto em branco) sobre a margem de erro foi quantificado. O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (61,36%, IC 95%: [55,45%; 67,28%]) e Leandro Grass para Governador (56,06%, IC 95%: [50,03%; 62,09%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto principalmente em função da faixa etária (p<0,0001 para os dois cargos); a associação com turno de coleta só foi significativa para Governador, e a associação com faixa de renda não foi significativa para nenhum dos dois cargos.
+As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, e o efeito da não-resposta (34% respondentes que deixaram a pergunta de voto em branco) sobre a margem de erro foi quantificado. O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (61,36%, IC 95%: \[55,45%; 67,28%\]) e Leandro Grass para Governador (56,06%, IC 95%: \[50,03%; 62,09%\]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto principalmente em função da faixa etária (p\<0,0001 para os dois cargos); a associação com turno de coleta só foi significativa para Governador, e a associação com faixa de renda não foi significativa para nenhum dos dois cargos.
 
 **Palavras-chave:** amostragem, amostragem sistemática, pesquisa eleitoral, intervalo de confiança, margem de erro, não-resposta.
 
@@ -81,22 +80,18 @@ Os objetivos específicos são:
 - avaliar o efeito da não-resposta sobre a precisão das estimativas, incluindo a verificação de não-resposta diferencial entre grupos;
 - verificar se há diferenças na intenção de voto entre subgrupos da amostra (turno de coleta, faixa etária e faixa de renda).
 
-
 # 2. Referencial Teórico
 
-A coleta de dados foi conduzida por meio de **amostragem sistemática**, utilizando um intervalo de seleção \(K=k\). Nesse procedimento, a cada \(k\) pessoas que passavam pelos pavilhões, uma era selecionada para participar da pesquisa. O processo teve início a partir de um ponto aleatório, definido por sorteio entre a 1ª e a \(k\)-ésima pessoa da sequência.
+A coleta de dados foi conduzida por meio de **amostragem sistemática**, utilizando um intervalo de seleção (K=k). Nesse procedimento, a cada (k) pessoas que passavam pelos pavilhões, uma era selecionada para participar da pesquisa. O processo teve início a partir de um ponto aleatório, definido por sorteio entre a 1ª e a (k)-ésima pessoa da sequência.
 
 O ponto inicial de cada entrevistador foi determinado a partir dos números aleatórios fornecidos pelo professor no início da disciplina, conforme apresentado na tabela a seguir:
 
-
 | Entrevistador | Número aleatório |
 |:--------------|-----------------:|
-| Caroline      | 1                |
-| Helio         | 5                |
-| Karine        | 8                |
-| Marcos Well   | 10               |
-
-
+| Caroline      |                1 |
+| Helio         |                5 |
+| Karine        |                8 |
+| Marcos Well   |               10 |
 
 Para fins de **estimação da variância e do erro-padrão**, a amostragem sistemática foi tratada como equivalente à **Amostragem Aleatória Simples sem reposição (AASs)**. Essa aproximação é adequada quando a população pode ser considerada em **ordem aleatória**, isto é, quando não há evidências de periodicidade, tendência ou outro padrão sistemático associado à variável de interesse. Essa abordagem é discutida na literatura clássica de amostragem, conforme Cochran (1977) e Bolfarine e Bussab (2004).
 
@@ -156,7 +151,7 @@ Neste trabalho, $k=K$. Cochran (1977) mostra que a amostragem sistemática equiv
 
 $$V(\bar{y}_{sis}) = \frac{N-1}{N}S^2 - \frac{k(n-1)}{N}S^2_{wsy}$$
 
- Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=k$) como equivalente à da AASs.
+Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=k$) como equivalente à da AASs.
 
 # 3. Materiais e Métodos
 
@@ -164,9 +159,9 @@ Toda a análise estatística deste trabalho foi conduzida no **software SAS**, u
 
 ## 3.1 Local e procedimento de coleta
 
-A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo foi a **amostragem sistemática com $K=k$**: a cada k pessoas que passavam pelo local, 1 era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a kª pessoa da sequência de chegada.
+A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo foi a **amostragem sistemática com** $K=k$: a cada k pessoas que passavam pelo local, 1 era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a kª pessoa da sequência de chegada.
 
-![Local de coleta — pavilhão na UnB](imagens/imagens_coleta/local_coleta_unb.jpeg){width=70%}
+![Local de coleta — pavilhão na UnB](imagens/imagens_coleta/local_coleta_unb.jpeg){width="70%"}
 
 ```{=latex}
 \begin{center}
@@ -208,7 +203,7 @@ $$f = \frac{n}{N} \approx \frac{264}{2.562.037} \approx 0{,}0001030 \;(0{,}0103\
 
 de modo que o fator de correção $fpc=\sqrt{1-f}\approx 0{,}99995$ (um efeito numérico desprezível sobre o erro-padrão das estimativas e que não altera nenhum resultado apresentado). Esse valor de $N$ foi informado ao `PROC SURVEYFREQ` por meio da opção `TOTAL=`, confirmando explicitamente que a população pode ser tratada como efetivamente infinita para fins de variância, em vez de simplesmente assumir isso sem verificação:
 
-```sas
+``` sas
 %let N_DF = 2562037;  /* TRE-DF, julho/2026 */
 
 proc surveyfreq data=amostra order=freq total=&N_DF.;
@@ -224,7 +219,7 @@ Embora os dados já estivessem integralmente coletados, o tamanho de amostra de 
 
 $$n_0 = \frac{Z^2\,p(1-p)}{e^2} = \frac{2^2 \times 0{,}5 \times 0{,}5}{0{,}05^2} = \frac{1}{0{,}05^2} = \frac{1}{e^2} = 400$$
 
-```sas
+``` sas
 data _null_;
     Z = 2;
     p = 0.5;
@@ -240,7 +235,7 @@ run;
 
 Quando um visitante era abordado e recusava participar da pesquisa ("Você quer/pode participar da pesquisa?" / "Não"), a recusa era registrada deixando a pergunta de voto **em branco(vazio)** no formulário. Por isso, as células em branco de Presidente/Governador são tratadas como não-resposta (*missing*) e excluídas do cálculo de $\hat p$ e do IC, enquanto "Não sei/não quero responder" permanece como mais uma categoria de voto válida:
 
-```sas
+``` sas
 data amostra;
     set amostra;
     presidente = strip(presidente);
@@ -269,7 +264,7 @@ Para simplificar **apenas a visualização**, criou-se a categoria **"Outros"**,
 
 Branco, Nulo e "Não sei/não quero responder" **não** entram nesse agrupamento, pois não são candidatos — e, na prática, todos ficam folgadamente acima de 1% nos dois cargos, então o critério não os afeta.
 
-Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados. 
+Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados.
 
 # 4. Análise dos Resultados
 
@@ -277,37 +272,37 @@ Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (
 
 Dos 400 respondentes, o perfil demográfico foi (as células em branco de Faixa etária e Faixa de renda foram tratadas como a opção "Sem resposta", já presente no instrumento, por isso nenhuma categoria de perfil abaixo fica com valor ausente):
 
-| Variável | Categoria | % |
-|---|---|---|
-| Sexo | Masculino | 51,00% |
-| Sexo | Feminino | 49,00% |
-| Faixa etária | 19 a 24 anos | 49,00% |
-| Faixa etária | Sem resposta (opção explícita) | 35,25% |
-| Faixa etária | Acima de 44 anos | 4,75% |
-| Faixa etária | 25 a 29 anos | 4,50% |
-| Faixa etária | até 18 anos | 4,00% |
-| Faixa etária | 30 a 34 anos | 1,25% |
-| Faixa etária | 40 a 44 anos | 0,75% |
-| Faixa etária | 35 a 39 anos | 0,50% |
+| Variável       | Categoria                      | \%     |
+|----------------|--------------------------------|--------|
+| Sexo           | Masculino                      | 51,00% |
+| Sexo           | Feminino                       | 49,00% |
+| Faixa etária   | 19 a 24 anos                   | 49,00% |
+| Faixa etária   | Sem resposta (opção explícita) | 35,25% |
+| Faixa etária   | Acima de 44 anos               | 4,75%  |
+| Faixa etária   | 25 a 29 anos                   | 4,50%  |
+| Faixa etária   | até 18 anos                    | 4,00%  |
+| Faixa etária   | 30 a 34 anos                   | 1,25%  |
+| Faixa etária   | 40 a 44 anos                   | 0,75%  |
+| Faixa etária   | 35 a 39 anos                   | 0,50%  |
 | Faixa de renda | Sem resposta (opção explícita) | 40,75% |
-| Faixa de renda | Mais de R\$ 10.000 | 16,75% |
-| Faixa de renda | R\$ 5.000 a R\$ 10.000 | 16,75% |
-| Faixa de renda | R\$ 2.000 a R\$ 5.000 | 16,00% |
-| Faixa de renda | R\$ 1.000 a R\$ 2.000 | 8,50% |
-| Faixa de renda | até R\$ 1.000 | 1,25% |
-| Turno | Manhã | 78,25% |
-| Turno | Tarde | 16,75% |
-| Turno | Noite | 5,00% |
+| Faixa de renda | Mais de R\$ 10.000             | 16,75% |
+| Faixa de renda | R\$ 5.000 a R\$ 10.000         | 16,75% |
+| Faixa de renda | R\$ 2.000 a R\$ 5.000          | 16,00% |
+| Faixa de renda | R\$ 1.000 a R\$ 2.000          | 8,50%  |
+| Faixa de renda | até R\$ 1.000                  | 1,25%  |
+| Turno          | Manhã                          | 78,25% |
+| Turno          | Tarde                          | 16,75% |
+| Turno          | Noite                          | 5,00%  |
 
 A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã. Salientamos que este ponto foi abordado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
 
-![Distribuição por Sexo](imagens/imagens_sas/perfil_sexo.png){width=70%}
+![Distribuição por Sexo](imagens/imagens_sas/perfil_sexo.png){width="70%"}
 
-![Distribuição por Faixa Etária](imagens/imagens_sas/perfil_etaria.png){width=80%}
+![Distribuição por Faixa Etária](imagens/imagens_sas/perfil_etaria.png){width="80%"}
 
-![Distribuição por Faixa de Renda Familiar](imagens/imagens_sas/perfil_renda.png){width=80%}
+![Distribuição por Faixa de Renda Familiar](imagens/imagens_sas/perfil_renda.png){width="80%"}
 
-![Distribuição por Turno de Coleta](imagens/imagens_sas/perfil_turno.png){width=70%}
+![Distribuição por Turno de Coleta](imagens/imagens_sas/perfil_turno.png){width="70%"}
 
 ## 4.2 Taxa de resposta
 
@@ -317,38 +312,38 @@ Como detalhado anteriormente, respostas em branco são tratadas como não-respos
 
 **Presidente:**
 
-| Candidato | $\hat{p}$ (%) | Erro-padrão | IC 95% |
-|---|---|---|---|
-| Luiz Inácio Lula da Silva | 61,36 | 3,00 | [55,45 ; 67,28] |
-| Renan Santos | 8,71 | 1,74 | [5,29 ; 12,14] |
-| Flavio Bolsonaro | 7,95 | 1,67 | [4,67 ; 11,24] |
-| Nulo | 5,30 | 1,38 | [2,58 ; 8,02] |
-| Branco | 4,55 | 1,28 | [2,02 ; 7,07] |
-| Não sei/não quero responder | 3,41 | 1,12 | [1,21 ; 5,61] |
-| Ronaldo Caiado | 2,65 | 0,99 | [0,70 ; 4,60] |
-| Augusto Cury | 2,65 | 0,99 | [0,70 ; 4,60] |
-| Samara Martins | 1,52 | 0,75 | [0,03 ; 3,00] |
-| Edmilson Costa | 0,76 | 0,53 | [0,00 ; 1,81] |
-| Rui Costa Pimenta | 0,38 | 0,38 | [0,00 ; 1,12] |
-| Hertz Dias | 0,38 | 0,38 | [0,00 ; 1,12] |
-| Romeu Zema | 0,38 | 0,38 | [0,00 ; 1,12] |
+| Candidato                   | $\hat{p}$ (%) | Erro-padrão | IC 95%            |
+|-----------------------------|---------------|-------------|-------------------|
+| Luiz Inácio Lula da Silva   | 61,36         | 3,00        | \[55,45 ; 67,28\] |
+| Renan Santos                | 8,71          | 1,74        | \[5,29 ; 12,14\]  |
+| Flavio Bolsonaro            | 7,95          | 1,67        | \[4,67 ; 11,24\]  |
+| Nulo                        | 5,30          | 1,38        | \[2,58 ; 8,02\]   |
+| Branco                      | 4,55          | 1,28        | \[2,02 ; 7,07\]   |
+| Não sei/não quero responder | 3,41          | 1,12        | \[1,21 ; 5,61\]   |
+| Ronaldo Caiado              | 2,65          | 0,99        | \[0,70 ; 4,60\]   |
+| Augusto Cury                | 2,65          | 0,99        | \[0,70 ; 4,60\]   |
+| Samara Martins              | 1,52          | 0,75        | \[0,03 ; 3,00\]   |
+| Edmilson Costa              | 0,76          | 0,53        | \[0,00 ; 1,81\]   |
+| Rui Costa Pimenta           | 0,38          | 0,38        | \[0,00 ; 1,12\]   |
+| Hertz Dias                  | 0,38          | 0,38        | \[0,00 ; 1,12\]   |
+| Romeu Zema                  | 0,38          | 0,38        | \[0,00 ; 1,12\]   |
 
 **Governador:**
 
-| Candidato | $\hat{p}$ (%) | Erro-padrão | IC 95% |
-|---|---|---|---|
-| Leandro Grass | 56,06 | 3,06 | [50,03 ; 62,09] |
-| Não sei/Não quero responder | 12,88 | 2,07 | [8,81 ; 16,95] |
-| Celina Leão | 8,71 | 1,74 | [5,29 ; 12,14] |
-| Nulo | 6,06 | 1,47 | [3,16 ; 8,96] |
-| Branco | 4,55 | 1,28 | [2,02 ; 7,07] |
-| Ricardo Cappelli | 3,41 | 1,12 | [1,21 ; 5,61] |
-| José Roberto Arruda | 2,65 | 0,99 | [0,70 ; 4,60] |
-| Kiko Caputo | 2,65 | 0,99 | [0,70 ; 4,60] |
-| Paula Belmonte | 1,52 | 0,75 | [0,03 ; 3,00] |
-| Professor Robson | 0,76 | 0,53 | [0,00 ; 1,81] |
-| Expedito Mendonça | 0,38 | 0,38 | [0,00 ; 1,12] |
-| Professora Samara Mineiro | 0,38 | 0,38 | [0,00 ; 1,12] |
+| Candidato                   | $\hat{p}$ (%) | Erro-padrão | IC 95%            |
+|-----------------------------|---------------|-------------|-------------------|
+| Leandro Grass               | 56,06         | 3,06        | \[50,03 ; 62,09\] |
+| Não sei/Não quero responder | 12,88         | 2,07        | \[8,81 ; 16,95\]  |
+| Celina Leão                 | 8,71          | 1,74        | \[5,29 ; 12,14\]  |
+| Nulo                        | 6,06          | 1,47        | \[3,16 ; 8,96\]   |
+| Branco                      | 4,55          | 1,28        | \[2,02 ; 7,07\]   |
+| Ricardo Cappelli            | 3,41          | 1,12        | \[1,21 ; 5,61\]   |
+| José Roberto Arruda         | 2,65          | 0,99        | \[0,70 ; 4,60\]   |
+| Kiko Caputo                 | 2,65          | 0,99        | \[0,70 ; 4,60\]   |
+| Paula Belmonte              | 1,52          | 0,75        | \[0,03 ; 3,00\]   |
+| Professor Robson            | 0,76          | 0,53        | \[0,00 ; 1,81\]   |
+| Expedito Mendonça           | 0,38          | 0,38        | \[0,00 ; 1,12\]   |
+| Professora Samara Mineiro   | 0,38          | 0,38        | \[0,00 ; 1,12\]   |
 
 **Margem de erro nominal (n=400, p=0,5, nc = 95%, pior caso):** ±4,91 pontos percentuais\
 **Margem de erro efetiva (n válido=264, descontando os 34,00% de não-resposta):** ±6,06 pontos percentuais
@@ -364,68 +359,68 @@ $$\text{var}(\hat p) = \frac{\hat p(1-\hat p)}{n-1} \qquad \text{se}(\hat p) = \
 **Luiz Inácio Lula da Silva (Presidente):** $\hat p = 162/264 = 0,6136$ (61,36%)
 
 | Cenário | $n$ | $\hat p(1-\hat p)$ | var($\hat p$) | se($\hat p$) | $t_{(0,975;\,n-1)}$ | Margem | IC 95% |
-|---|---|---|---|---|---|---|---|
-| Real (com não-resposta) | 264 | 0,6136 × 0,3864 = 0,2371 | 0,2371/263 = 0,000901 | 3,00% | 1,9690 | 5,91 p.p. | [55,45% ; 67,28%] |
-| Hipotético (sem não-resposta) | 400 | 0,6136 × 0,3864 = 0,2371 | 0,2371/399 = 0,000594 | 2,44% | 1,9659 | 4,79 p.p. | [56,57% ; 66,16%] |
+|---------|---------|---------|---------|---------|---------|---------|---------|
+| Real (com não-resposta) | 264 | 0,6136 × 0,3864 = 0,2371 | 0,2371/263 = 0,000901 | 3,00% | 1,9690 | 5,91 p.p. | \[55,45% ; 67,28%\] |
+| Hipotético (sem não-resposta) | 400 | 0,6136 × 0,3864 = 0,2371 | 0,2371/399 = 0,000594 | 2,44% | 1,9659 | 4,79 p.p. | \[56,57% ; 66,16%\] |
 
 A margem de erro para Lula passou de ±4,79 p.p. (se não houvesse não-resposta) para ±5,91 p.p. (cenário real) — um aumento de 1,12 p.p., só pela redução do $n$ de 400 para 264 (a proporção $\hat p$ foi mantida fixa nos dois cálculos, isolando o efeito do tamanho da amostra sobre a precisão).
 
 **Leandro Grass (Governador):** $\hat p = 148/264 = 0,5606$ (56,06%)
 
 | Cenário | $n$ | $\hat p(1-\hat p)$ | var($\hat p$) | se($\hat p$) | $t_{(0,975;\,n-1)}$ | Margem | IC 95% |
-|---|---|---|---|---|---|---|---|
-| Real (com não-resposta) | 264 | 0,5606 × 0,4394 = 0,2463 | 0,2463/263 = 0,000937 | 3,06% | 1,9690 | 6,03 p.p. | [50,03% ; 62,09%] |
-| Hipotético (sem não-resposta) | 400 | 0,5606 × 0,4394 = 0,2463 | 0,2463/399 = 0,000617 | 2,48% | 1,9659 | 4,88 p.p. | [51,18% ; 60,95%] |
+|---------|---------|---------|---------|---------|---------|---------|---------|
+| Real (com não-resposta) | 264 | 0,5606 × 0,4394 = 0,2463 | 0,2463/263 = 0,000937 | 3,06% | 1,9690 | 6,03 p.p. | \[50,03% ; 62,09%\] |
+| Hipotético (sem não-resposta) | 400 | 0,5606 × 0,4394 = 0,2463 | 0,2463/399 = 0,000617 | 2,48% | 1,9659 | 4,88 p.p. | \[51,18% ; 60,95%\] |
 
 Para Leandro Grass, a margem de erro passou de ±4,88 p.p. para ±6,03 p.p. — aumento de 1,15 p.p., na mesma linha do observado para Lula e do efeito genérico (p=0,5) já reportado acima. Em ambos os casos, a redução de $n$ causada pela não-resposta de 34,00% é responsável por todo o aumento, já que a proporção $\hat p$ foi mantida idêntica entre os dois cenários.
 
-![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_sas/voto_presidente_ic.png){width=85%}
+![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_sas/voto_presidente_ic.png){width="85%"}
 
-![Intenção de voto - Governador (%) com IC 95%](imagens/imagens_sas/voto_governador_ic.png){width=85%}
+![Intenção de voto - Governador (%) com IC 95%](imagens/imagens_sas/voto_governador_ic.png){width="85%"}
 
 ## 4.4 Análise por subgrupos (Sexo, Turno, Faixa Etária, Faixa de Renda)
 
 Os testes qui-quadrado de associação entre o candidato escolhido e cada variável de perfil indicaram:
 
 | Cruzamento | Qui-quadrado (GL) | p-valor | Observação |
-|---|---|---|---|
-| Presidente x Sexo | 28,50 (12) | **0,0047** | 62% das células com contagem esperada <5 — teste pode não ser válido |
-| Governador x Sexo | 10,37 (11) | 0,4971 | 58% das células com contagem esperada <5 — não significativo |
-| Presidente x Faixa de Renda | 61,60 (60) | 0,4185 | 86% das células com contagem esperada <5 — não significativo |
-| Presidente x Faixa Etária | 199,50 (84) | <0,0001 | 89% das células com contagem esperada <5 — teste pode não ser válido |
-| Presidente x Turno | 33,99 (24) | 0,0849 | 74% das células com contagem esperada <5 — não significativo |
-| Governador x Faixa de Renda | 60,93 (55) | 0,2712 | 85% das células com contagem esperada <5 — não significativo |
-| Governador x Faixa Etária | 143,66 (77) | <0,0001 | 89% das células com contagem esperada <5 — teste pode não ser válido |
-| Governador x Turno | 43,02 (22) | **0,0047** | 69% das células com contagem esperada <5 — teste pode não ser válido |
+|------------------|------------------|------------------|------------------|
+| Presidente x Sexo | 28,50 (12) | **0,0047** | 62% das células com contagem esperada \<5 — teste pode não ser válido |
+| Governador x Sexo | 10,37 (11) | 0,4971 | 58% das células com contagem esperada \<5 — não significativo |
+| Presidente x Faixa de Renda | 61,60 (60) | 0,4185 | 86% das células com contagem esperada \<5 — não significativo |
+| Presidente x Faixa Etária | 199,50 (84) | \<0,0001 | 89% das células com contagem esperada \<5 — teste pode não ser válido |
+| Presidente x Turno | 33,99 (24) | 0,0849 | 74% das células com contagem esperada \<5 — não significativo |
+| Governador x Faixa de Renda | 60,93 (55) | 0,2712 | 85% das células com contagem esperada \<5 — não significativo |
+| Governador x Faixa Etária | 143,66 (77) | \<0,0001 | 89% das células com contagem esperada \<5 — teste pode não ser válido |
+| Governador x Turno | 43,02 (22) | **0,0047** | 69% das células com contagem esperada \<5 — teste pode não ser válido |
 
 - **Sexo:** resultado também diferente entre os dois cargos. Para **Presidente**, o teste qui-quadrado indicou associação estatisticamente significativa entre sexo e candidato escolhido (p=0,0047). Para **Governador**, não houve evidência de associação (p=0,4971). Como em 62% das células a contagem esperada é menor que 5 (reflexo dos candidatos minoritários terem poucos votos), o resultado de Presidente deve ser lido como indício, não como conclusão definitiva.
 - **Faixa de renda:** diferente do que se observava antes do tratamento da não-resposta desta versão da base, o cruzamento **deixou de ser estatisticamente significativo** para os dois cargos (Presidente p=0,4185; Governador p=0,2712). Ou seja, não há evidência, nesta amostra, de que a faixa de renda esteja associada ao candidato escolhido.
-- **Faixa etária:** continua fortemente significativa para os dois cargos (p<0,0001), mas sofre de forte esparsidade (89% das células com contagem esperada <5 em ambos), dado o grande número de categorias de candidatos combinado com faixas pouco povoadas (ex.: 35 a 39 anos tem apenas 2 respondentes no total). A leitura qualitativa dos gráficos é mais confiável que o p-valor nesse caso.
+- **Faixa etária:** continua fortemente significativa para os dois cargos (p\<0,0001), mas sofre de forte esparsidade (89% das células com contagem esperada \<5 em ambos), dado o grande número de categorias de candidatos combinado com faixas pouco povoadas (ex.: 35 a 39 anos tem apenas 2 respondentes no total). A leitura qualitativa dos gráficos é mais confiável que o p-valor nesse caso.
 - **Turno:** o resultado foi diferente entre os dois cargos. Para **Governador**, o teste qui-quadrado indicou diferença estatisticamente significativa na intenção de voto entre os turnos (p=0,0047). Para **Presidente**, não houve evidência de associação (p=0,0849), embora mais próxima do limiar de 5% do que antes do tratamento da não-resposta. **Importante:** em ambos os cruzamentos, o próprio SAS alerta que mais de 2/3 das células têm contagem esperada menor que 5 (reflexo do turno Noite ter apenas 20 respondentes e dos candidatos minoritários terem poucas respostas) — isso torna o teste qui-quadrado estatisticamente pouco confiável nesses cruzamentos, e deve ser mencionado como limitação ao relatar esses resultados, inclusive o único que deu significativo (Governador x Turno), não como conclusão definitiva.
 
-![Presidente por Sexo (% dentro de cada sexo)](imagens/imagens_sas/presidente_por_sexo.png){width=80%}
+![Presidente por Sexo (% dentro de cada sexo)](imagens/imagens_sas/presidente_por_sexo.png){width="80%"}
 
-![Governador por Sexo (% dentro de cada sexo)](imagens/imagens_sas/governador_por_sexo.png){width=80%}
+![Governador por Sexo (% dentro de cada sexo)](imagens/imagens_sas/governador_por_sexo.png){width="80%"}
 
-![Presidente por Faixa de Renda (% dentro de cada faixa)](imagens/imagens_sas/presidente_por_renda.png){width=85%}
+![Presidente por Faixa de Renda (% dentro de cada faixa)](imagens/imagens_sas/presidente_por_renda.png){width="85%"}
 
-![Presidente por Faixa Etária (% dentro de cada faixa)](imagens/imagens_sas/presidente_por_etaria.png){width=85%}
+![Presidente por Faixa Etária (% dentro de cada faixa)](imagens/imagens_sas/presidente_por_etaria.png){width="85%"}
 
-![Presidente por Turno (% dentro de cada turno)](imagens/imagens_sas/presidente_por_turno.png){width=80%}
+![Presidente por Turno (% dentro de cada turno)](imagens/imagens_sas/presidente_por_turno.png){width="80%"}
 
-![Governador por Faixa de Renda (% dentro de cada faixa)](imagens/imagens_sas/governador_por_renda.png){width=85%}
+![Governador por Faixa de Renda (% dentro de cada faixa)](imagens/imagens_sas/governador_por_renda.png){width="85%"}
 
-![Governador por Faixa Etária (% dentro de cada faixa)](imagens/imagens_sas/governador_por_etaria.png){width=85%}
+![Governador por Faixa Etária (% dentro de cada faixa)](imagens/imagens_sas/governador_por_etaria.png){width="85%"}
 
-![Governador por Turno (% dentro de cada turno)](imagens/imagens_sas/governador_por_turno.png){width=80%}
+![Governador por Turno (% dentro de cada turno)](imagens/imagens_sas/governador_por_turno.png){width="80%"}
 
 # 5. Conclusões
 
 A pesquisa eleitoral conduzida nos pavilhoes João Calmon e Anisio Teixeira em Brasília, com uma amostra de 400 eleitores coletados por amostragem sistemática (com intervalo $K$ próprio de cada entrevistador), permitiu estimar a intenção de voto para Presidente e Governador com margem de erro de aproximadamente ±4,91 pontos percentuais (nominal) e ±6,06 pontos percentuais (efetiva, considerando a não-resposta de 34,00%).
 
-O candidato à Presidência com maior intenção de voto foi **Luiz Inácio Lula da Silva** (61,36%, IC 95%: [55,45%; 67,28%]). Para Governador, o líder foi **Leandro Grass** (56,06%, IC 95%: [50,03%; 62,09%]), com uma parcela expressiva de indecisos ("Não sei/Não quero responder", 12,88%).
+O candidato à Presidência com maior intenção de voto foi **Luiz Inácio Lula da Silva** (61,36%, IC 95%: \[55,45%; 67,28%\]). Para Governador, o líder foi **Leandro Grass** (56,06%, IC 95%: \[50,03%; 62,09%\]), com uma parcela expressiva de indecisos ("Não sei/Não quero responder", 12,88%).
 
-A análise por subgrupos indicou que a **faixa etária** é a variável mais associada à intenção de voto para os dois cargos (p<0,0001), enquanto **faixa de renda não mostrou associação significativa** para nenhum dos dois (Presidente p=0,4185; Governador p=0,2712). Para **turno** e para **sexo**, o resultado divergiu entre os cargos em direções opostas: turno foi significativo para Governador (p=0,0047) mas não para Presidente (p=0,0849); sexo foi significativo para Presidente (p=0,0047) mas não para Governador (p=0,4971). Mesmo os resultados significativos devem ser interpretados com cautela, já que a validade do teste é limitada pela baixa contagem esperada em boa parte das células (69% no cruzamento Governador x Turno, 62% em Presidente x Sexo), decorrente do pequeno número de entrevistas no turno da Noite (n=20) e de candidatos minoritários com poucos votos. Recomenda-se tratar esses achados como indícios a serem investigados, não como conclusões definitivas.
+A análise por subgrupos indicou que a **faixa etária** é a variável mais associada à intenção de voto para os dois cargos (p\<0,0001), enquanto **faixa de renda não mostrou associação significativa** para nenhum dos dois (Presidente p=0,4185; Governador p=0,2712). Para **turno** e para **sexo**, o resultado divergiu entre os cargos em direções opostas: turno foi significativo para Governador (p=0,0047) mas não para Presidente (p=0,0849); sexo foi significativo para Presidente (p=0,0047) mas não para Governador (p=0,4971). Mesmo os resultados significativos devem ser interpretados com cautela, já que a validade do teste é limitada pela baixa contagem esperada em boa parte das células (69% no cruzamento Governador x Turno, 62% em Presidente x Sexo), decorrente do pequeno número de entrevistas no turno da Noite (n=20) e de candidatos minoritários com poucos votos. Recomenda-se tratar esses achados como indícios a serem investigados, não como conclusões definitivas.
 
 Como limitações do estudo, destacam-se: (i) a **não-resposta de 34,00% nas perguntas de voto** que reduz consideravelmente o n efetivo e aumenta a margem de erro, com indício de não-resposta diferencial por sexo (mulheres 37,24% vs. homens 30,88%), o que é um ponto de atenção relevante para a validade externa das estimativas; e (ii) a forte concentração da amostra na faixa etária de 19 a 24 anos (49,00% dos respondentes), que limita a representatividade do levantamento em relação à distribuição etária real do eleitorado de Brasília.
 
