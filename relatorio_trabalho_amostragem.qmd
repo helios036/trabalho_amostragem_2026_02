@@ -56,7 +56,7 @@ Marcos Well Neres Silva Pereira\\
 
 # Resumo
 
-As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática (com intervalo $K$ definido por sorteio individual de cada entrevistador — Seção 2) tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, e o efeito da não-resposta (34% — respondentes que deixaram a pergunta de voto em branco) sobre a margem de erro foi quantificado. O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (61,36%, IC 95%: [55,45%; 67,28%]) e Leandro Grass para Governador (56,06%, IC 95%: [50,03%; 62,09%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto principalmente em função da faixa etária (p<0,0001 para os dois cargos); a associação com turno de coleta só foi significativa para Governador, e a associação com faixa de renda não foi significativa para nenhum dos dois cargos — com ressalvas quanto à validade do teste qui-quadrado em todos os cruzamentos dado o pequeno número de observações esperadas em boa parte das células.
+As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, e o efeito da não-resposta (34% respondentes que deixaram a pergunta de voto em branco) sobre a margem de erro foi quantificado. O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (61,36%, IC 95%: [55,45%; 67,28%]) e Leandro Grass para Governador (56,06%, IC 95%: [50,03%; 62,09%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto principalmente em função da faixa etária (p<0,0001 para os dois cargos); a associação com turno de coleta só foi significativa para Governador, e a associação com faixa de renda não foi significativa para nenhum dos dois cargos.
 
 **Palavras-chave:** amostragem, amostragem sistemática, pesquisa eleitoral, intervalo de confiança, margem de erro, não-resposta.
 
@@ -80,6 +80,7 @@ Os objetivos específicos são:
 - justificar, por meio da fórmula de dimensionamento amostral, o tamanho de amostra (n=400) efetivamente utilizado na coleta;
 - avaliar o efeito da não-resposta sobre a precisão das estimativas, incluindo a verificação de não-resposta diferencial entre grupos;
 - verificar se há diferenças na intenção de voto entre subgrupos da amostra (turno de coleta, faixa etária e faixa de renda).
+
 
 # 2. Referencial Teórico
 
@@ -109,29 +110,29 @@ Para variáveis categóricas (como o candidato escolhido), define-se $Y_i=1$ se 
 
 ## 2.2 Estimador pontual e variância (AAS sem reposição)
 
-Dentro do plano AASs, a proporção amostral $p=a/n$ (onde $a$ é o número de respondentes na classe $C$, dentre os $n$ válidos) é um estimador não viesado de $P$ (Cochran, 1977, Teorema 3.1; Bolfarine & Bussab, 2004, Corolário 3.4). Sua variância é:
+Dentro do plano AASs, a proporção amostral $p=a/n$ (onde $a$ é o número de respondentes na classe $C$, dentre os $n$ válidos) é um estimador não viesado de $P$ (Cochran, 1977). Sua variância é:
 
 $$Var(p) = \frac{S^2}{n}\left(\frac{N-n}{N}\right) = \frac{PQ}{n}\left(\frac{N-n}{N-1}\right), \qquad Q = 1-P$$
 
-(Cochran, 1977, Teorema 2.2 e Eq. 3.6; Bolfarine & Bussab, 2004, Eq. 3.30). O fator $(N-n)/N = 1-f$, onde $f=n/N$ é a fração amostral, é chamado **correção de população finita** (*fpc*) — ele só é aplicável quando $N$ é conhecido e finito. Quando a população é desconhecida ou muito grande em relação à amostra (caso deste trabalho, em que a população de eleitores é muito maior que $n=400$), o fpc tende a 1 e a variância se reduz à forma usual:
+O fator $(N-n)/N = 1-f$, onde $f=n/N$ é a fração amostral (fpc) é aplicável quando $N$ é conhecido e finito. Quando a população é desconhecida ou muito grande em relação à amostra o fpc tende a 1 e a variância se reduz à forma usual:
 
 $$Var(p) \approx \frac{p(1-p)}{n}$$
 
-O estimador amostral não viesado dessa variância, substituindo $P,Q$ pelos valores amostrais $p,q=1-p$, é (Cochran, 1977, Eq. 3.8; Bolfarine & Bussab, 2004, Eq. 3.31–3.32 com divisor $n-1$):
+O estimador amostral não viesado dessa variância, substituindo $P,Q$ pelos valores amostrais $p,q=1-p$, é (Cochran, 1977):
 
 $$var(p) = (1-f)\,\frac{p\,q}{n-1}$$
 
 ## 2.3 Erro-padrão e intervalo de confiança
 
-O erro-padrão é $EP(p)=\sqrt{Var(p)}$. Assumindo normalidade assintótica de $p$ (válida para $n$ suficientemente grande, Bolfarine & Bussab, 2004, Seção 3.3.4), o intervalo de confiança aproximado de coeficiente $1-\alpha$ para $P$ é (Cochran, 1977, Eq. 2.23; Bolfarine & Bussab, 2004, Eq. 3.32):
+O erro-padrão é $EP(p)=\sqrt{Var(p)}$. Assumindo normalidade assintótica de $p$ (Bolfarine & Bussab, 2004), o intervalo de confiança aproximado de coeficiente $1-\alpha$ para $P$ é (Cochran, 1977):
 
 $$IC(P;\,1-\alpha) = p \pm Z_{\alpha/2}\sqrt{(1-f)\,\frac{p\,q}{n-1}}$$
 
-onde $Z_{\alpha/2}$ é o percentil da Normal padrão para a confiança desejada (ex.: $Z=1{,}96$ para 95%). Para $N$ desconhecido/grande, $f\to 0$ e o intervalo se reduz a $p \pm Z_{\alpha/2}\sqrt{p(1-p)/n}$, forma empregada pelo `PROC SURVEYFREQ` do SAS neste trabalho.
+onde $Z_{\alpha/2}$ é o percentil da Normal padrão para a confiança desejada (ex.: $Z=1{,}96$ para 95%). Para $N$ desconhecido/grande, $f\to 0$ e o intervalo se reduz a $p \pm Z_{\alpha/2}\sqrt{p(1-p)/n}$, forma empregada pela função `PROC SURVEYFREQ` do SAS.
 
 ## 2.4 Determinação do tamanho da amostra
 
-Fixada uma margem de erro tolerável $d$ e um risco $\alpha$ de que o erro real exceda $d$, isto é, $\Pr(|p-P|\geq d)=\alpha$, resolve-se para $n$ a partir da variância de $p$ (Cochran, 1977, Seção 4.4, Eq. 4.1):
+Definida uma margem de erro tolerável $d$ e um risco $\alpha$ de que o erro real exceda $d$, isto é, $\Pr(|p-P|\geq d)=\alpha$, resolve-se para $n$ a partir da variância de $p$ (Cochran, 1977):
 
 $$n = \dfrac{\dfrac{Z_{\alpha/2}^2\,PQ}{d^2}}{1+\dfrac{1}{N}\left(\dfrac{Z_{\alpha/2}^2\,PQ}{d^2}-1\right)}$$
 
@@ -147,15 +148,15 @@ Essa é a fórmula usada na Seção 3.3 deste relatório para justificar o $n=40
 
 ## 2.5 Amostragem sistemática
 
-Considerando uma população com $N$ elementos ordenados de 1 a $N$, com $N=kn$ ($k$ inteiro). Uma unidade é sorteada aleatoriamente entre as $k$ primeiras unidades (número aleatório inicial $r\in\{1,\dots,k\}$), e as demais unidades da amostra são obtidas a intervalos regulares de comprimento $k$ (Cochran, 1977, Cap. 8, Seção 8.1; Bolfarine & Bussab, 2004, Seção 7.8):
+Considerando uma população com $N$ elementos ordenados de 1 a $N$, com $N=kn$ ($k$ inteiro). Uma unidade é sorteada aleatoriamente entre as $k$ primeiras unidades (número aleatório inicial $r\in\{1,\dots,k\}$), e as demais unidades da amostra são obtidas a intervalos regulares de comprimento $k$ (Cochran, 1977):
 
 $$\text{elementos selecionados} = r,\ r+k,\ r+2k,\ \dots,\ r+(n-1)k$$
 
-Neste trabalho, $k=K$. Cochran (1977, Seção 8.2) mostra que a amostragem sistemática equivale à seleção aleatória de **um único conglomerado** dentre $k$ conglomerados possíveis (cada um com $n$ unidades), de modo que sua variância verdadeira é:
+Neste trabalho, $k=K$. Cochran (1977) mostra que a amostragem sistemática equivale à seleção aleatória de **um único conglomerado** dentre $k$ conglomerados possíveis (cada um com $n$ unidades), de modo que sua variância verdadeira é:
 
 $$V(\bar{y}_{sis}) = \frac{N-1}{N}S^2 - \frac{k(n-1)}{N}S^2_{wsy}$$
 
-(Cochran, 1977, Teorema 8.1; equivalentemente, Bolfarine & Bussab, 2004, Eq. 7.6–7.8, em termos do coeficiente de correlação intraclasse $\rho_{int}$: $V_k=\{1+\rho_{int}(n-1)\}\,\sigma^2/n$). Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004, Eq. 7.7; Corolário 3.5). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=k$) como equivalente à da AASs.
+ Quando a população está em ordem aleatória (sem tendência ou periodicidade), a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004). É essa a aproximação adotada neste trabalho: não há motivo para supor que a ordem de chegada das pessoas ao pavilhão seja cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática ($K=k$) como equivalente à da AASs.
 
 # 3. Materiais e Métodos
 
@@ -205,7 +206,7 @@ Salientamos que os respondentes abordados nos pavilhões não constituem uma amo
 
 $$f = \frac{n}{N} \approx \frac{264}{2.562.037} \approx 0{,}0001030 \;(0{,}0103\%)$$
 
-de modo que o fator de correção $fpc=\sqrt{1-f}\approx 0{,}99995$ — um efeito numérico desprezível sobre o erro-padrão das estimativas (não altera nenhum resultado reportado em casas decimais relevantes). Esse valor de $N$ foi informado ao `PROC SURVEYFREQ` por meio da opção `TOTAL=`, confirmando explicitamente — com fonte oficial — que a população pode ser tratada como efetivamente infinita para fins de variância, em vez de simplesmente assumir isso sem verificação:
+de modo que o fator de correção $fpc=\sqrt{1-f}\approx 0{,}99995$ (um efeito numérico desprezível sobre o erro-padrão das estimativas e que não altera nenhum resultado apresentado). Esse valor de $N$ foi informado ao `PROC SURVEYFREQ` por meio da opção `TOTAL=`, confirmando explicitamente que a população pode ser tratada como efetivamente infinita para fins de variância, em vez de simplesmente assumir isso sem verificação:
 
 ```sas
 %let N_DF = 2562037;  /* TRE-DF, julho/2026 */
@@ -222,8 +223,6 @@ Fonte: TRE-DF (2026). *Distrito Federal ultrapassa 2,56 milhões de eleitores e 
 Embora os dados já estivessem integralmente coletados, o tamanho de amostra de **n = 400** pessoas pode ser justificado a partir do erro $e=5\%$, conforme apresentado abaixo:
 
 $$n_0 = \frac{Z^2\,p(1-p)}{e^2} = \frac{2^2 \times 0{,}5 \times 0{,}5}{0{,}05^2} = \frac{1}{0{,}05^2} = \frac{1}{e^2} = 400$$
-
-O resultado bate **exatamente** com o $n=400$ seguindo a regra prática $n_0=1/e^2$ usual em pesquisas eleitorais no Brasil. Esse cálculo foi implementado no SAS como:
 
 ```sas
 data _null_;
@@ -259,30 +258,24 @@ data amostra;
 run;
 ```
 
-Com isso, a taxa de não-resposta é de **34,00%** (136 de 400) para Presidente e para Governador.
+Desta forma, verificou-se que a taxa de não-resposta é de **34,00%** (136 de 400) para Presidente e para Governador.
 
 ## 3.5 Agrupamento de candidatos minoritários nos gráficos ("Outros")
 
-Com 12 a 13 categorias de resposta por cargo (candidatos mais Branco, Nulo e "Não sei/não quero responder"), os gráficos de barra (especialmente as legendas dos gráficos ficavam poluídos e com segmentos minúsculos de difícil leitura). Para simplificar **apenas a visualização**, criou-se a categoria **"Outros"**, que consolida todo candidato cuja votação represente **menos de 1% dos votos válidos** ($n=264$, descontando a não-resposta da Seção 3.4):
+Para simplificar **apenas a visualização**, criou-se a categoria **"Outros"**, que consolida todo candidato cuja votação represente **menos de 1% dos votos válidos** ($n=264$, descontando a não-resposta da Seção 3.4):
 
 - **Presidente:** Edmilson Costa (0,76%), Rui Costa Pimenta (0,38%), Hertz Dias (0,38%) e **Romeu Zema (0,38%)**.
 - **Governador:** Professor Robson (0,76%), Expedito Mendonça (0,38%) e Professora Samara Mineiro (0,38%).
 
 Branco, Nulo e "Não sei/não quero responder" **não** entram nesse agrupamento, pois não são candidatos — e, na prática, todos ficam folgadamente acima de 1% nos dois cargos, então o critério não os afeta.
 
-Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados. Nos gráficos (gerados no SAS — ver Seção 3.6), o sufixo numérico entre parênteses que identificava o candidato no instrumento de coleta (ex.: "Luiz Inácio Lula da Silva (5)") foi removido dos rótulos, para não ser confundido com um valor de votação; o mesmo nome simplificado é usado nas tabelas deste relatório a partir daqui.
-
-Nos gráficos empilhados (Seção 4.4), a ordem da legenda foi fixada assim: primeiro os candidatos nomeados, em **ordem alfabética**; em seguida "Outros"; e por último, em tons de cinza, o bloco de situações de não-voto (Branco, Nulo, Sem resposta e Não sei/não quero responder) — separando visualmente quem recebeu um voto de quem não indicou um candidato.
-
-## 3.6 Geração dos gráficos no SAS
-
-Todos os gráficos deste relatório — perfil da amostra, não-resposta, intenção de voto com IC 95% e os cruzamentos por subgrupo (Seção 4.4) — são gerados diretamente no SAS, via `PROC SGPLOT`, no script `script_sas/trabalho_amostragem.sas`. O agrupamento "Outros" (Seção 3.5) é calculado por uma macro genérica (`%agrupar_outros`) que relê as contagens de cada candidato a cada execução, e a paleta de cores fixa por candidato — com ordem de legenda específica (candidatos em ordem alfabética, depois "Outros", depois o bloco de não-voto em tons de cinza) — é definida via `ATTRMAP`, aplicada por três macros reutilizáveis: `%grafico_perfil` (barras de perfil), `%grafico_ic` (intenção de voto com IC 95%) e `%grafico_empilhado` (cruzamentos por subgrupo, barras empilhadas a 100%). Essa consolidação em um único script elimina a necessidade de uma etapa externa em Python para a geração dos gráficos.
+Esse agrupamento é usado **somente nos gráficos**; as tabelas de estimativas (Seção 4.3) e os testes qui-quadrado por subgrupo (Seção 4.4) mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados. 
 
 # 4. Análise dos Resultados
 
 ## 4.1 Perfil da amostra
 
-Dos 400 respondentes, o perfil demográfico foi (as células em branco de Faixa etária e Faixa de renda foram tratadas como a opção "Sem resposta", já presente no instrumento — Seção 3.4 — por isso nenhuma categoria de perfil abaixo fica com valor ausente):
+Dos 400 respondentes, o perfil demográfico foi (as células em branco de Faixa etária e Faixa de renda foram tratadas como a opção "Sem resposta", já presente no instrumento, por isso nenhuma categoria de perfil abaixo fica com valor ausente):
 
 | Variável | Categoria | % |
 |---|---|---|
@@ -306,7 +299,7 @@ Dos 400 respondentes, o perfil demográfico foi (as células em branco de Faixa 
 | Turno | Tarde | 16,75% |
 | Turno | Noite | 5,00% |
 
-A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã — isso deve ser mencionado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
+A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã. Salientamos que este ponto foi abordado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
 
 ![Distribuição por Sexo](imagens/imagens_sas/perfil_sexo.png){width=70%}
 
@@ -318,7 +311,7 @@ A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etári
 
 ## 4.2 Taxa de resposta
 
-Como detalhado na Seção 3.4, respostas em branco são tratadas como não-resposta (*missing*) nas perguntas de intenção de voto: a taxa de resposta é de **66,00%** (264 de 400) para Presidente e para Governador — os mesmos 136 respondentes (34,00%) deixaram as duas perguntas em branco. Essa é uma taxa de não-resposta expressivamente mais alta que a observada nas demais variáveis de perfil, e deve ser lida como uma limitação relevante do levantamento (Seção 5).
+Como detalhado anteriormente, respostas em branco são tratadas como não-resposta (*missing*) nas perguntas de intenção de voto: a taxa de resposta é de **66,00%** (264 de 400) para Presidente e para Governador. Trata-se de uma taxa de não-resposta expressivamente mais alta que a observada nas demais variáveis de perfil, e deve ser lida como uma limitação relevante do levantamento.
 
 ## 4.3 Estimativas pontuais, erro-padrão e IC 95% (PROC SURVEYFREQ, n válido = 264)
 
@@ -364,7 +357,7 @@ Como detalhado na Seção 3.4, respostas em branco são tratadas como não-respo
 
 ### 4.3.1 Demonstração do cálculo: efeito da não-resposta na margem de erro
 
-A margem de erro acima usa o cenário de pior caso ($p=0,5$) para toda a amostra. Para tornar o efeito da não-resposta mais concreto, demonstra-se abaixo o cálculo completo — variância, erro-padrão e margem de erro, pela fórmula de Cochran (Seção 2.2) — para os dois candidatos mais votados, comparando o $n$ efetivamente observado (264, com a não-resposta de 34,00%) com um cenário hipotético em que a mesma proporção de votos tivesse sido obtida sobre os 400 respondentes nominais, sem nenhuma recusa:
+A margem de erro acima usa o cenário de pior caso ($p=0,5$) para toda a amostra. Para tornar o efeito da não-resposta mais concreto, demonstra-se abaixo o cálculo completo para os dois candidatos mais votados, comparando o $n$ efetivamente observado (264, com a não-resposta de 34,00%) com um cenário hipotético em que a mesma proporção de votos tivesse sido obtida sobre os 400 respondentes nominais, sem nenhuma recusa:
 
 $$\text{var}(\hat p) = \frac{\hat p(1-\hat p)}{n-1} \qquad \text{se}(\hat p) = \sqrt{\text{var}(\hat p)} \qquad \text{margem} = t_{(0{,}975;\,n-1)} \times \text{se}(\hat p)$$
 
@@ -428,13 +421,13 @@ Os testes qui-quadrado de associação entre o candidato escolhido e cada variá
 
 # 5. Conclusões
 
-A pesquisa eleitoral conduzida nos pavilhoes João Calmon e Anisio Teixeira em Brasília, com uma amostra de 400 eleitores coletados por amostragem sistemática (com intervalo $K$ próprio de cada entrevistador, conforme sorteio inicial — Seção 2), permitiu estimar a intenção de voto para Presidente e Governador com margem de erro de aproximadamente ±4,91 pontos percentuais (nominal) e ±6,06 pontos percentuais (efetiva, considerando a não-resposta de 34,00%).
+A pesquisa eleitoral conduzida nos pavilhoes João Calmon e Anisio Teixeira em Brasília, com uma amostra de 400 eleitores coletados por amostragem sistemática (com intervalo $K$ próprio de cada entrevistador), permitiu estimar a intenção de voto para Presidente e Governador com margem de erro de aproximadamente ±4,91 pontos percentuais (nominal) e ±6,06 pontos percentuais (efetiva, considerando a não-resposta de 34,00%).
 
-O candidato à Presidência com maior intenção de voto foi **Luiz Inácio Lula da Silva** (61,36%, IC 95%: [55,45%; 67,28%]). Para Governador, o líder foi **Leandro Grass** (56,06%, IC 95%: [50,03%; 62,09%]), com uma parcela expressiva de indecisos ("Não sei/Não quero responder", 12,88%) — diferente de Presidente, em que essa categoria ficou bem menor (3,41%).
+O candidato à Presidência com maior intenção de voto foi **Luiz Inácio Lula da Silva** (61,36%, IC 95%: [55,45%; 67,28%]). Para Governador, o líder foi **Leandro Grass** (56,06%, IC 95%: [50,03%; 62,09%]), com uma parcela expressiva de indecisos ("Não sei/Não quero responder", 12,88%).
 
 A análise por subgrupos indicou que a **faixa etária** é a variável mais associada à intenção de voto para os dois cargos (p<0,0001), enquanto **faixa de renda não mostrou associação significativa** para nenhum dos dois (Presidente p=0,4185; Governador p=0,2712). Para **turno** e para **sexo**, o resultado divergiu entre os cargos em direções opostas: turno foi significativo para Governador (p=0,0047) mas não para Presidente (p=0,0849); sexo foi significativo para Presidente (p=0,0047) mas não para Governador (p=0,4971). Mesmo os resultados significativos devem ser interpretados com cautela, já que a validade do teste é limitada pela baixa contagem esperada em boa parte das células (69% no cruzamento Governador x Turno, 62% em Presidente x Sexo), decorrente do pequeno número de entrevistas no turno da Noite (n=20) e de candidatos minoritários com poucos votos. Recomenda-se tratar esses achados como indícios a serem investigados, não como conclusões definitivas.
 
-Como limitações do estudo, destacam-se: (i) a **não-resposta de 34,00% nas perguntas de voto** — bem mais alta que em qualquer outra variável do estudo —, que reduz consideravelmente o n efetivo e aumenta a margem de erro, com indício de não-resposta diferencial por sexo (mulheres 37,24% vs. homens 30,88% — Seção 3.4), o que é um ponto de atenção relevante para a validade externa das estimativas.
+Como limitações do estudo, destacam-se: (i) a **não-resposta de 34,00% nas perguntas de voto** — bem mais alta que em qualquer outra variável do estudo —, que reduz consideravelmente o n efetivo e aumenta a margem de erro, com indício de não-resposta diferencial por sexo (mulheres 37,24% vs. homens 30,88% — Seção 3.4), o que é um ponto de atenção relevante para a validade externa das estimativas; e (ii) a forte concentração da amostra na faixa etária de 19 a 24 anos (49,00% dos respondentes — Seção 4.1), que limita a representatividade do levantamento em relação à distribuição etária real do eleitorado de Brasília.
 
 # Referências {.unnumbered}
 
