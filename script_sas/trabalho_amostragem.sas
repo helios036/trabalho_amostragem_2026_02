@@ -54,8 +54,8 @@ options validvarname=any;   /* permite nomes de coluna com espaço/acento no imp
    PROC IMPORT (o SAS Studio roda num servidor Linux, não no seu PC).
    Baixe todos os PNGs gerados para a pasta local imagens/imagens_sas/.
    ------------------------------------------------------------------------- */
-%let outpath = /home/helios_0190/imagens;
-
+ %let outpath = /home/u64538097/sasuser.v94/Trabalho_amostragem/imagens; 
+ 
 ods listing gpath="&outpath." image_dpi=200;
 ods graphics on / width=800px height=500px imagefmt=png reset=all;
 
@@ -63,10 +63,11 @@ ods graphics on / width=800px height=500px imagefmt=png reset=all;
    1. IMPORTAÇÃO DA AMOSTRA
    ------------------------------------------------------------------------- */
 proc import out=amostra_raw
-    datafile="/home/u64542467/trabalho_amostragem_2026_2/intenções_de_voto_pavilhões.xlsx"
+    datafile="/home/u64538097/sasuser.v94/Trabalho_amostragem/intenções_de_voto_pavilhões_v2.xlsx"
     dbms=xlsx replace;
     getnames=yes;
 run;
+
 
 /* -------------------------------------------------------------------------
    2. PREPARAÇÃO
@@ -79,20 +80,17 @@ run;
         "Luiz Inácio Lula da Silva"), para os nomes ficarem exatamente como
         aparecem nas tabelas do relatório e como entrada da paleta de cores
         (Seção 10)
-      - NESTA VERSÃO (v2) da planilha, a não-resposta em Presidente/
-        Governador/Faixa etária/Faixa de renda aparece como célula
-        genuinamente em branco (136 respondentes, 34%) - não há mais o
-        texto "Sem resposta" em Presidente/Governador. Em Faixa etária/
-        Faixa de renda, "Sem resposta" ainda aparece como opção
-        explícita (5 e 27 casos) ao lado de células em branco (136) -
-        as duas coisas são unificadas sob o mesmo rótulo "Sem resposta"
-        abaixo, pois ali é uma opção legítima do perfil, não recusa.
+      - v3: TRATAMENTO DE NÃO-RESPOSTA POR COMBINAÇÃO DAS 4 COLUNAS:
+        * Em todos os casos mapeados, as colunas correspondentes são convertidas 
+          para vazias ('').
+        * Ao final, quem possui as 4 colunas vazias é classificado como não-respondente.
+        * Foram encontrados 139 não-respondentes
    ------------------------------------------------------------------------- */
 data amostra;
     set amostra_raw;
     rename
         'Sexo'n                     = sexo
-        'Faixa etária'n              = faixa_etaria
+        'Faixa etária'n             = faixa_etaria
         'Faixa de renda familiar'n   = faixa_renda
         'Presidente'n                = presidente
         'Governador'n                = governador
@@ -106,30 +104,86 @@ data amostra;
 
     presidente = strip(presidente);
     governador = strip(governador);
+    faixa_etaria = strip(faixa_etaria);
+    faixa_renda = strip(faixa_renda);
+
     /* remove o sufixo " (n)" do nome do candidato, se houver */
     if not missing(presidente) then
         presidente = strip(prxchange('s/\s*\(\d+\)\s*$//', 1, presidente));
+
     if not missing(governador) then
         governador = strip(prxchange('s/\s*\(\d+\)\s*$//', 1, governador));
+        
+    /* Padroniza as respostas de Presidente e Governador */
+	if upcase(compbl(strip(presidente))) = 'NÃO SEI/NÃO QUERO RESPONDER' then
+    presidente = 'Não sei/não quero responder';
 
-    /* Faixa etária/renda: célula em branco = mesma coisa que a opção
-       explícita "Sem resposta" (ambas significam que a pessoa não
-       informou essa variável de perfil) - unifica num só rótulo. */
-    if missing(faixa_etaria) then faixa_etaria = 'Sem resposta';
-    if missing(faixa_renda)  then faixa_renda  = 'Sem resposta';
+	if upcase(compbl(strip(governador))) = 'NÃO SEI / NÃO QUERO RESPONDER' then
+    governador = 'Não sei/não quero responder';    
 
-    /* Presidente/Governador: célula em branco é recusa à pergunta de
-       voto - mantém como missing (não-resposta), diferente de "Não
-       sei/não quero responder", que é resposta engajada e válida.
-       Nesta versão (v2) da planilha não existe mais o texto "Sem
-       resposta" nessas duas colunas (só célula em branco), mas a linha
-       abaixo é mantida por segurança caso o texto reapareça numa
-       futura atualização da planilha. */
-    if presidente = 'Sem resposta' then presidente = '';
-    if governador = 'Sem resposta' then governador = '';
+    length status_respondente $20 regra_aplicada $20;
+
+    status_respondente = 'Respondente';
+    regra_aplicada = 'Nenhuma';
+
+    /* Regra 1 */
+    if faixa_etaria = 'Sem resposta'
+       and faixa_renda = 'Sem resposta'
+       and presidente = 'Não sei/não quero responder'
+       and governador = 'Não sei/não quero responder' then
+        regra_aplicada = 'Regra 1';
+
+    /* Regra 2 */
+    else if missing(faixa_etaria)
+        and missing(faixa_renda)
+        and missing(presidente)
+        and missing(governador) then
+        regra_aplicada = 'Regra 2';
+
+    /* Regra 3 */
+    else if missing(faixa_etaria)
+        and faixa_renda = 'Sem resposta'
+        and presidente = 'Não sei/não quero responder'
+        and governador = 'Não sei/não quero responder' then
+        regra_aplicada = 'Regra 3';
+
+    /* Regra 4 */
+    else if faixa_etaria = 'Sem resposta'
+        and missing(faixa_renda)
+        and presidente = 'Não sei/não quero responder'
+        and governador = 'Não sei/não quero responder' then
+        regra_aplicada = 'Regra 4';
+
+    /* Regra 5 */
+    else if faixa_etaria = 'Sem resposta'
+        and faixa_renda = 'Sem resposta'
+        and missing(presidente)
+        and missing(governador) then
+        regra_aplicada = 'Regra 5';
+
+    /* Regra 6 */
+    else if faixa_etaria = 'Sem resposta'
+        and missing(faixa_renda)
+        and missing(presidente)
+        and missing(governador) then
+        regra_aplicada = 'Regra 6';
+
+    /* Regra 7 */
+    else if faixa_renda = 'Sem resposta'
+        and missing(faixa_etaria)
+        and missing(presidente)
+        and missing(governador) then
+        regra_aplicada = 'Regra 7';
+
+    /* Classificação e limpeza dos não respondentes */
+    if regra_aplicada ne 'Nenhuma' then do;
+        status_respondente = 'Não-respondente';
+        faixa_etaria = '';
+        faixa_renda = '';
+        presidente = '';
+        governador = '';
+    end;
 run;
-
-proc contents data=amostra varnum; run;
 
 /* -------------------------------------------------------------------------
    2.1 VARIÁVEIS ORDENADAS (para os gráficos seguirem um critério lógico,
@@ -221,57 +275,50 @@ proc freq data=amostra;
     tables sexo_ord etaria_ord renda_ord turno_ord / nocum;
 run;
 title;
+  
+/* ------------------------------------------------------------------------- 
+	4.1 IDENTIFICAÇÃO E CONTAGEM DOS NÃO-RESPONDENTES TOTAIS
+  - calcula o percentual de não-respondentes totais
+------------------------------------------------------------------------- */
+
+title "Respondentes e não-respondentes totais";
+proc freq data=amostra;
+    tables status_respondente / missing nocum;
+run;
+
+title;
 
 /* -------------------------------------------------------------------------
-   4. NÃO-RESPOSTA (item non-response)
-      Quantifica quantos respondentes recusaram responder Presidente/
-      Governador - isso inclui tanto quem ficou literalmente em branco
-      quanto quem marcou "Sem resposta" (ambos já viram missing() na
-      seção 2, ver comentário lá), diferente da categoria "Não sei/Não
-      quero responder", que é uma resposta válida e engajada (a pessoa
-      respondeu, só não quis/soube nomear um candidato). Também verifica
-      se a não-resposta se distribui igualmente entre os sexos (checagem
-      de não-resposta diferencial, que pode indicar viés).
+   4.2 NÃO-RESPOSTA (item non-response)
+     Analise sobre os não respondentes.
    ------------------------------------------------------------------------- */
-data amostra;
-    set amostra;
-    resp_presidente = ifc(missing(presidente), 'Nao respondeu', 'Respondeu');
-    resp_governador = ifc(missing(governador), 'Nao respondeu', 'Respondeu');
+  
+title "Respondentes e não respondentes totais";
+proc freq data=amostra;
+    tables status_respondente / missing nocum;
 run;
 
-title "Taxa de não-resposta - Presidente e Governador";
+title "Não-resposta total por Sexo";
 proc freq data=amostra;
-    tables resp_presidente resp_governador / nocum;
-run;
-
-title "Não-resposta por Sexo (checagem de não-resposta diferencial)";
-proc freq data=amostra;
-    tables sexo*resp_presidente sexo*resp_governador / nocol nopercent;
+    tables sexo*status_respondente / nocol nopercent;
 run;
 title;
 
-ods graphics / imagename="naoresposta_presidente";
-title "Taxa de resposta - Presidente";
+ods graphics / imagename="naoresposta_total";
+title "Respondentes e não respondentes totais";
 proc sgplot data=amostra;
-    vbar resp_presidente / stat=percent datalabel;
+    vbar status_respondente / stat=percent datalabel;
     yaxis label="Percentual (%)" grid;
     xaxis label=" ";
 run;
 title;
 
-ods graphics / imagename="naoresposta_governador";
-title "Taxa de resposta - Governador";
+ods graphics / imagename="naoresposta_sexo";
+title "Não-resposta total por Sexo";
 proc sgplot data=amostra;
-    vbar resp_governador / stat=percent datalabel;
-    yaxis label="Percentual (%)" grid;
-    xaxis label=" ";
-run;
-title;
-
-ods graphics / imagename="naoresposta_sexo_presidente";
-title "Não-resposta por Sexo - Presidente";
-proc sgplot data=amostra;
-    vbar sexo / group=resp_presidente groupdisplay=cluster stat=percent datalabel;
+    vbar sexo / group=status_respondente
+                groupdisplay=cluster
+                stat=percent datalabel;
     yaxis label="Percentual (%)" grid;
     xaxis label="Sexo";
 run;
@@ -279,24 +326,66 @@ title;
 
 data _null_;
     set amostra end=eof;
-    retain n_miss_pres 0 n_miss_gov 0;
-    if missing(presidente) then n_miss_pres + 1;
-    if missing(governador) then n_miss_gov + 1;
-    if eof then do;
-        n_valid_pres = &n_nominal. - n_miss_pres;
-        n_valid_gov  = &n_nominal. - n_miss_gov;
-        call symputx('n_miss_pres', n_miss_pres);
-        call symputx('n_miss_gov', n_miss_gov);
-        call symputx('n_valid_pres', n_valid_pres);
-        call symputx('n_valid_gov', n_valid_gov);
+    retain n_nao_resp 0 n_total 0;
 
-        put "n nominal da amostra: &n_nominal.";
-        put "Não-resposta Presidente: " n_miss_pres " (" ((n_miss_pres/&n_nominal.)*100) 4.1 "%)";
-        put "Não-resposta Governador: " n_miss_gov " (" ((n_miss_gov/&n_nominal.)*100) 4.1 "%)";
-        put "n válido p/ Presidente: " n_valid_pres;
-        put "n válido p/ Governador: " n_valid_gov;
+    n_total + 1;
+
+    if status_respondente = 'Não-respondente' then
+        n_nao_resp + 1;
+
+    if eof then do;
+        n_resp = n_total - n_nao_resp;
+
+        call symputx('n_nao_resp', n_nao_resp);
+        call symputx('n_resp', n_resp);
+        call symputx('n_total_real', n_total);
+
+        put "n total da amostra: " n_total;
+        put "Não respondentes totais: " n_nao_resp
+            " (" (n_nao_resp/n_total*100) 6.2 "%)";
+        put "Respondentes totais: " n_resp
+            " (" (n_resp/n_total*100) 6.2 "%)";
     end;
 run;
+
+/* -------------------------------------------------------------------------
+   4.3 NÃO RESPOSTA ÀS PERGUNTAS DE PRESIDENTE E GOVERNADOR
+
+   Analisa exclusivamente os indivíduos classificados como "Respondente"
+   na seção 2, identificando quem deixou em branco as perguntas eleitorais.
+
+   - Campo vazio: não respondeu à pergunta.
+   - "Sem resposta": não respondeu à pergunta.
+   - "Não sei/não quero responder": resposta válida.
+   - Os não respondentes totais são excluídos desta análise.
+   ------------------------------------------------------------------------- */
+
+data amostra_respondentes;
+    set amostra;
+
+    where status_respondente = 'Respondente';
+
+    length resp_presidente resp_governador $20;
+
+    if missing(presidente)
+       or upcase(compbl(strip(presidente))) = 'SEM RESPOSTA'
+    then resp_presidente = 'Recusou/omitiu';
+    else resp_presidente = 'Respondeu';
+
+    if missing(governador)
+       or upcase(compbl(strip(governador))) = 'SEM RESPOSTA'
+    then resp_governador = 'Recusou/omitiu';
+    else resp_governador = 'Respondeu';
+
+run;
+
+title "Não resposta às perguntas eleitorais entre os respondentes";
+
+proc freq data=amostra_respondentes;
+    tables resp_presidente resp_governador / nocum;
+run;
+
+title;
 
 /* -------------------------------------------------------------------------
    5. MARGEM DE ERRO: NOMINAL (n=400) x EFETIVA (descontando não-resposta)
@@ -559,7 +648,7 @@ data paleta_gov;
 7|Outros|CXC2A878
 8|Branco|CXBFBFBF
 9|Nulo|CX808080
-10|Não sei / Não quero responder|CX404040
+10|Não sei/não quero responder|CX404040
 ;
 run;
 
@@ -627,7 +716,9 @@ run;
         rename &grp. = categoria;
     run;
 
-    proc sort data=_ic; by pct; by descending pct; run;   /* maior no topo do gráfico */
+    proc sort data=_ic;
+        by descending pct;      /* maior no topo do gráfico */
+    run;    
 
     ods graphics / reset=index imagename="&nome." width=900px height=600px;
     title1 bold "&titulo.";
