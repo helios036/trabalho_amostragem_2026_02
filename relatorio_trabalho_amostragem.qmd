@@ -153,11 +153,13 @@ Quando a população está em ordem aleatória, a amostragem sistemática tem pr
 
 # 3. Materiais e Métodos
 
-Toda a análise estatística deste trabalho foi conduzida no **software SAS**, utilizando os procedimentos `PROC IMPORT` (leitura da base), `PROC FREQ` e `PROC SURVEYFREQ`, `PROC SGPLOT` (gráficos) e `DATA` steps para tratamento da base e cálculos auxiliares.
+Toda a análise estatística deste trabalho foi conduzida no **software SAS**, utilizando os procedimentos `PROC IMPORT` (leitura da base), `PROC FREQ` e `PROC SURVEYFREQ` (estimativas de proporção, variância e intervalo de confiança), `PROC SGPLOT` (gráficos) e `DATA` steps para tratamento da base e cálculos auxiliares. O script completo está disponível no arquivo `trabalho_amostragem.sas`.
 
 ## 3.1 Local e procedimento de coleta
 
-A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo foi a **amostragem sistemática com** $K=k$: a cada k pessoas que passavam pelo local, 1 era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a kª pessoa da sequência de chegada.
+A coleta foi realizada presencialmente nos pavilhões da Universidade de Brasília, por meio de abordagem direta aos visitantes. O plano amostral de campo adotado foi a *amostragem sistemática com* $K=k$, a cada $k$ pessoas que passavam pelo local, uma era selecionada para ser entrevistada, com início aleatório sorteado entre a 1ª e a $k$-ésima pessoa da sequência de chegada.
+
+O valor de $k$ correspondia ao número aleatório associado a cada aluno entrevistador, sendo o procedimento realizado até que cada aluno completasse 100 entrevistas.
 
 ![Local de coleta — pavilhão na UnB](imagens/imagens_coleta/local_coleta_unb.jpeg){width="70%"}
 
@@ -191,21 +193,21 @@ A coleta foi realizada presencialmente em pavilhões na cidade de Brasília, por
 \end{center}
 ```
 
-A coleta foi dividida em três turnos (Manhã, Tarde e Noite), sendo conduzido em duplas, totalizando 400 registros válidos.
+A coleta foi dividida em três turnos (Manhã, Tarde e Noite), cada um conduzido por um membro ou dupla da equipe, totalizando 400 registros válidos.
 
 ## 3.2 População de referência e correção de população finita (fpc)
 
-Salientamos que os respondentes abordados nos pavilhões não constituem uma amostra probabilística de todo o eleitorado do Distrito Federal, o tamanho desse eleitorado foi usado para formalizar, em vez de apenas presumir, a decisão de omitir a correção de população finita (fpc) nas estimativas de intenção de voto. Segundo o TRE-DF (julho/2026), o Distrito Federal possui $N=2.562.037$ eleitores. Com $n=261$, a fração amostral é:
+Destacamos que os respondentes abordados nos pavilhões não constituem uma amostra probabilística de todo o eleitorado do Distrito Federal. Ainda assim, o tamanho desse eleitorado foi considerado para fundamentar, de forma explícita, a decisão de não aplicar a correção para população finita (fpc) nas estimativas de intenção de voto. Segundo o TRE-DF (julho de 2026), o Distrito Federal possui $N=2.562.037$ eleitores. Considerando o tamanho amostral de $n=261$, a fração amostral é dada por:
 
-$$f = \frac{n}{N} \approx \frac{261}{2.562.037} \approx 0{,}0001019 \;(0{,}0102\%)$$
+$$f = \frac{n}{N} \approx \frac{261}{2.562.037} \approx 0{,}0001018 \;(0{,}0102\%)$$
 
-de modo que o fator de correção $fpc=\sqrt{1-f}\approx 0{,}99995$ (um efeito numérico desprezível sobre o erro-padrão das estimativas e que não altera nenhum resultado apresentado). Esse valor de $N$ foi informado ao `PROC SURVEYFREQ` por meio da opção `TOTAL=`, confirmando explicitamente que a população pode ser tratada como efetivamente infinita para fins de variância, em vez de simplesmente assumir isso sem verificação:
+Consequentemente, o fator de correção para população finita é $fpc=\sqrt{1-f}\approx 0{,}99994$, indicando um efeito numérico desprezível sobre o erro-padrão das estimativas, sem impacto nos resultados apresentados. Esse valor de $N$ foi informado ao `PROC SURVEYFREQ` por meio da opção `TOTAL=`, permitindo verificar explicitamente que a correção para população finita é numericamente irrelevante neste caso, em vez de simplesmente presumir que a população é efetivamente infinita para fins de cálculo da variância.
 
-``` sas
+```sas
 %let N_DF = 2562037;  /* TRE-DF, julho/2026 */
 
 proc surveyfreq data=amostra order=freq total=&N_DF.;
-    tables presidente / cl;
+    tables presidente / var cl;
 run;
 ```
 
@@ -213,11 +215,15 @@ Fonte: TRE-DF (2026). *Distrito Federal ultrapassa 2,56 milhões de eleitores e 
 
 ## 3.3 Justificativa do tamanho da amostra (n = 400)
 
-Embora os dados já estivessem integralmente coletados, o tamanho de amostra de **n = 400** pessoas pode ser justificado a partir do erro $e=5\%$, conforme apresentado abaixo:
+EEmbora os dados já estivessem integralmente coletados, o tamanho amostral de **n = 400** pessoas pode ser justificado teoricamente com base em uma margem de erro de $e=5\%$, conforme demonstrado a seguir. Para esse cálculo, utiliza-se a fórmula clássica de determinação do tamanho amostral para estimar uma proporção populacional:
 
 $$n_0 = \frac{Z^2\,p(1-p)}{e^2} = \frac{2^2 \times 0{,}5 \times 0{,}5}{0{,}05^2} = \frac{1}{0{,}05^2} = \frac{1}{e^2} = 400$$
 
-``` sas
+Nessa expressão, $Z$ representa o valor crítico associado ao nível de confiança desejado. Neste caso, adota-se $Z \approx 2$ como uma aproximação do valor crítico de $1{,}96$, correspondente ao nível de confiança de 95% em uma distribuição normal padrão. O parâmetro $p$ representa a proporção populacional esperada, sendo adotado $p=0{,}5$ por corresponder ao cenário de máxima variabilidade e, consequentemente, produzir o tamanho amostral mais conservador. Já $e=0{,}05$ representa a margem de erro absoluta de cinco pontos percentuais.
+
+Assim, o valor de 400 entrevistas constitui uma referência teórica para o planejamento amostral, considerando os parâmetros convencionais de confiança e margem de erro.
+
+```sas
 data _null_;
     Z = 2;
     p = 0.5;
@@ -231,22 +237,44 @@ run;
 
 ## 3.4 Tratamento da não-resposta
 
-Quando um visitante era abordado e recusava participar da pesquisa ("Você quer/pode participar da pesquisa?" / "Não"), a recusa foi registrada deixando em branco as perguntas do formulário (Faixa etária, Faixa de renda, Presidente e Governador). Desta forma, identificaram-se **139 não-respondentes totais** (34,75% de 400).
+Quando um visitante era abordado e recusava participar da pesquisa ("Você quer/pode participar da pesquisa?" / "Não"), a recusa era registrada deixando a pergunta de voto **em branco(vazio)** no formulário. Por isso, as células em branco de Presidente/Governador são tratadas como não-resposta (*missing*) e excluídas do cálculo de $\hat p$ e do IC, enquanto "Não sei/não quero responder" permanece como mais uma categoria de voto válida:
 
-## 3.5 Agrupamento de candidatos minoritários nos gráficos ("Outros")
+```sas
+data amostra;
+    set amostra;
+    presidente = strip(presidente);
+    governador = strip(governador);
+    if missing(faixa_etaria) then faixa_etaria = 'Sem resposta';
+    if missing(faixa_renda)  then faixa_renda  = 'Sem resposta';
+    if presidente = 'Sem resposta' then presidente = '';
+    if governador = 'Sem resposta' then governador = '';
+run;
 
-Para simplificar apenas a visualização, criou-se a categoria "Outros", que consolida todo candidato cuja votação represente menos de 1% dos votos válidos ($n=261$):
+data amostra;
+    set amostra;
+    resp_presidente = ifc(missing(presidente), 'Nao respondeu', 'Respondeu');
+    resp_governador = ifc(missing(governador), 'Nao respondeu', 'Respondeu');
+run;
+```
+
+Desta forma, verificou-se que a taxa de não-resposta é de **34,75%** (139 de 400) para Presidente e para Governador.
+
+## 3.5 Consolidação de candidatos com menos de 1% dos votos na categoria "Outros"
+
+Para simplificar a visualização dos resultados nos gráficos, criou-se a categoria "Outros", que reúne os candidatos cuja votação individual corresponde a menos de 1% dos votos válidos ($n=261$, após o desconto das não respostas, conforme descrito na Seção 3.4).
 
 - Presidente: Edmilson Costa (0,77%), Rui Costa Pimenta (0,38%), Hertz Dias (0,38%) e Romeu Zema (0,38%).
 - Governador: Professor Robson (0,77%), Expedito Mendonça (0,38%) e Professora Samara Mineiro (0,38%).
 
-Esse agrupamento foi utilizado somente nos gráficos; as tabelas de estimativas e os testes qui-quadrado por subgrupo mantêm o detalhamento candidato a candidato, sem nenhuma perda de informação nos resultados numéricos reportados.
+As categorias Branco, Nulo e "Não sei/não quero responder" não foram incluídas nesse agrupamento, uma vez que não correspondem a candidatos. Além disso, suas proporções superam 1% em ambos os cargos, de modo que não atendem ao critério estabelecido para a consolidação.
+
+Ressalta-se que esse agrupamento foi aplicado exclusivamente à apresentação gráfica. As tabelas de estimativas (Seção 4.3) e os testes de qui-quadrado por subgrupo (Seção 4.4) preservam a discriminação individual de cada candidato, sem perda de detalhamento nos resultados numéricos apresentados.
 
 # 4. Análise dos Resultados
 
 ## 4.1 Perfil da amostra
 
-Sexo e Turno são observados para os 400 respondentes. Já Faixa etária e Faixa de renda só são conhecidas para os 261 respondentes não classificados como não-respondentes totais.  Desta forma, para estas duas variáveis são reportadas sobre a base de $n=261$, e não de $n=400$:
+Dos 400 respondentes, o perfil demográfico foi (as células em branco de Faixa etária e Faixa de renda foram tratadas como a opção "Sem resposta", já presente no instrumento, por isso nenhuma categoria de perfil abaixo fica com valor ausente):
 
 | Variável       | Categoria                      | Base    | \%     |
 |----------------|---------------------------------|---------|--------|
@@ -270,7 +298,7 @@ Sexo e Turno são observados para os 400 respondentes. Já Faixa etária e Faixa
 | Turno          | Tarde                          | n=400   | 16,75% |
 | Turno          | Noite                          | n=400   | 5,00%  |
 
-A amostra é equilibrada entre sexos, mas fortemente concentrada no turno da manhã (em razão das aulas dos membros do grupo ocorrerem majoritariamente pela manhã) e na faixa etária de 19 a 24 anos: entre os 261 respondentes com faixa etária conhecida, 75,10% têm entre 19 e 24 anos. Salientamos que este ponto foi abordado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
+A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã. Salientamos que este ponto foi abordado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
 
 ![Distribuição por Sexo](imagens/imagens_sas/perfil_sexo.png){width="70%"}
 
@@ -282,7 +310,7 @@ A amostra é equilibrada entre sexos, mas fortemente concentrada no turno da man
 
 ## 4.2 Taxa de resposta
 
-Como detalhado na Seção anteriormente, os respondentes classificados como não-respondentes totais têm as quatro variáveis sensíveis (Faixa etária, Faixa de renda, Presidente e Governador) tratadas como não-resposta (*missing*): a taxa de resposta é de **65,25%** (261 de 400) para as perguntas de intenção de voto. Trata-se de uma taxa de não-resposta expressivamente mais alta que a observada em Sexo e Turno (sempre conhecidos), e deve ser lida como uma limitação relevante do levantamento.
+Como detalhado anteriormente, respostas em branco são tratadas como não-resposta (*missing*) nas perguntas de intenção de voto: a taxa de resposta é de **65,25%** (261 de 400) para Presidente e para Governador. Trata-se de uma taxa de não-resposta expressivamente mais alta que a observada nas demais variáveis de perfil, e deve ser lida como uma limitação relevante do levantamento.
 
 ## 4.3 Estimativas pontuais, erro-padrão e IC 95% (PROC SURVEYFREQ, n válido = 261)
 
@@ -309,7 +337,7 @@ Como detalhado na Seção anteriormente, os respondentes classificados como não
 | Candidato                   | $\hat{p}$ (%) | Erro-padrão | IC 95%            |
 |-----------------------------|---------------|-------------|-------------------|
 | Leandro Grass               | 56,70         | 3,07        | \[50,65 ; 62,76\] |
-| Não sei/não quero responder | 11,88         | 2,01        | \[7,93 ; 15,83\]  |
+| Não sei/Não quero responder | 11,88         | 2,01        | \[7,93 ; 15,83\]  |
 | Celina Leão                 | 8,81          | 1,76        | \[5,35 ; 12,27\]  |
 | Nulo                        | 6,13          | 1,49        | \[3,20 ; 9,06\]   |
 | Branco                      | 4,60          | 1,30        | \[2,04 ; 7,16\]   |
@@ -324,7 +352,7 @@ Como detalhado na Seção anteriormente, os respondentes classificados como não
 **Margem de erro nominal (n=400, p=0,5, nc = 95%, pior caso):** ±4,91 pontos percentuais\
 **Margem de erro efetiva (n válido=261, descontando os 34,75% de não-resposta):** ±6,09 pontos percentuais
 
-> A não-resposta reduziu o n efetivo de 400 para 261, o que aumentou a margem de erro, de ±4,91 p.p. para ±6,09 p.p., resultando em um efeito real e substancial (1,18 p.p.), decorrente de uma taxa de não-resposta de 34,75%.
+> A não-resposta reduziu o n efetivo de 400 para 261, o que **aumentou consideravelmente** a margem de erro, de ±4,91 p.p. para ±6,09 p.p., resultando em um efeito real e substancial (1,18 p.p.), decorrente de uma taxa de não-resposta de 34,75%.
 
 ### 4.3.1 Demonstração do cálculo: efeito da não-resposta na margem de erro
 
@@ -337,7 +365,7 @@ $$\text{var}(\hat p) = \frac{\hat p(1-\hat p)}{n-1} \qquad \text{se}(\hat p) = \
 | Cenário | $n$ | $\hat p(1-\hat p)$ | var($\hat p$) | se($\hat p$) | $t_{(0,975;\,n-1)}$ | Margem | IC 95% |
 |---------|---------|---------|---------|---------|---------|---------|---------|
 | Real (com não-resposta) | 261 | 0,6207 × 0,3793 = 0,2354 | 0,2354/260 = 0,000905 | 3,01% | 1,9691 | 5,93 p.p. | \[56,14% ; 67,99%\] |
-| Hipotético (sem não-resposta) | 400 | 0,6207 × 0,3793 = 0,2354 | 0,2354/399 = 0,000590 | 2,43% | 1,9659 | 4,78 p.p. | \[57,29% ; 66,84%\] |
+| Hipotético (sem não-resposta) | 400 | 0,6207 × 0,3793 = 0,2354 | 0,2354/399 = 0,000590 | 2,43% | 1,9659 | 4,78 p.p. | \[57,29% ; 66,85%\] |
 
 A margem de erro para Lula passou de ±4,78 p.p. (se não houvesse não-resposta) para ±5,93 p.p. (cenário real) — um aumento de 1,15 p.p., só pela redução do $n$ de 400 para 261 (a proporção $\hat p$ foi mantida fixa nos dois cálculos, isolando o efeito do tamanho da amostra sobre a precisão).
 
@@ -346,13 +374,18 @@ A margem de erro para Lula passou de ±4,78 p.p. (se não houvesse não-resposta
 | Cenário | $n$ | $\hat p(1-\hat p)$ | var($\hat p$) | se($\hat p$) | $t_{(0,975;\,n-1)}$ | Margem | IC 95% |
 |---------|---------|---------|---------|---------|---------|---------|---------|
 | Real (com não-resposta) | 261 | 0,5670 × 0,4330 = 0,2455 | 0,2455/260 = 0,000944 | 3,07% | 1,9691 | 6,05 p.p. | \[50,65% ; 62,76%\] |
-| Hipotético (sem não-resposta) | 400 | 0,5670 × 0,4330 = 0,2455 | 0,2455/399 = 0,000615 | 2,48% | 1,9659 | 4,88 p.p. | \[51,83% ; 61,58%\] |
+| Hipotético (sem não-resposta) | 400 | 0,5670 × 0,4330 = 0,2455 | 0,2455/399 = 0,000615 | 2,48% | 1,9659 | 4,88 p.p. | \[51,82% ; 61,58%\] |
 
-Para Leandro Grass, a margem de erro passou de ±4,88 p.p. para ±6,05 p.p., um aumento de 1,17 p.p., na mesma linha do observado para Lula e do efeito genérico (p=0,5) já abordado acima.
+Para Leandro Grass, a margem de erro passou de ±4,88 p.p. para ±6,05 p.p. — aumento de 1,17 p.p., na mesma linha do observado para Lula e do efeito genérico (p=0,5) já reportado acima. Em ambos os casos, a redução de $n$ causada pela não-resposta de 34,75% é responsável por todo o aumento, já que a proporção $\hat p$ foi mantida idêntica entre os dois cenários.
 
-![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_sas/voto_presidente_ic.png){width="85%"}
+![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_sas/voto_presidente_ic_total.png){width="85%"}
 
-![Intenção de voto - Governador (%) com IC 95%](imagens/imagens_sas/voto_governador_ic.png){width="85%"}
+![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_sas/voto_presidente_ic_respondentes.png){width="85%"}
+
+![Intenção de voto - Governador (%) com IC 95%](imagens/imagens_sas/voto_governador_ic_total.png){width="85%"}
+
+![Intenção de voto - Governador (%) com IC 95%](imagens/imagens_sas/voto_governador_ic_respondentes.png){width="85%"}
+
 
 ## 4.4 Análise por subgrupos (Sexo, Turno, Faixa Etária, Faixa de Renda)
 
