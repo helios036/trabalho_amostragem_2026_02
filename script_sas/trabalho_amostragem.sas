@@ -2,9 +2,9 @@
    TRABALHO DE AMOSTRAGEM
    Base: Intenção de voto - Pavilhões (Brasília) - planilha v2
 
-   PLANO AMOSTRAL DE CAMPO: Amostragem Sistemática, com intervalo K=5
-   (a cada 5 pessoas que passavam pelo pavilhão, 1 era abordada, com
-   início aleatório sorteado entre a 1ª e a 5ª pessoa da sequência).
+   PLANO AMOSTRAL DE CAMPO: Amostragem Sistemática, com intervalo K 
+   (a cada K pessoas que passavam pelo pavilhão, 1 era abordada, com
+   início aleatório sorteado entre a 1ª e a Kª pessoa da sequência).
    Amostra nominal: n = 400, de uma população desconhecida/grande
    (sem correção de população finita - fpc).
 
@@ -12,18 +12,17 @@
    amostragem sistemática é tratada de forma equivalente à AAS - essa é
    a prática padrão quando não há suspeita de periodicidade/tendência
    na ordem de chegada das pessoas no pavilhão (não há motivo para
-   acreditar que a cada 5ª pessoa exista um padrão sistemático de
+   acreditar que a cada Kª pessoa exista um padrão sistemático de
    intenção de voto). Essa suposição deve ser declarada no relatório.
 
    Objetivo: estimar as proporções de intenção de voto na população,
    com variância, margem de erro, intervalo de confiança, e avaliar
    o efeito da não-resposta sobre a precisão das estimativas - também
-   por Sexo, além de Faixa de Renda, Faixa Etária e Turno.
+   por Sexo, além de Faixa de Renda, Faixa Etária e Turno da entrevista.
 
    Todos os gráficos (perfil, não-resposta, IC e cruzamentos por
    subgrupo) são gerados diretamente neste script via `PROC SGPLOT`,
-   através das macros definidas na Seção 11 - não há mais um script
-   Python separado para os gráficos de IC/cruzamentos.
+   através das macros definidas na Seção 13.
    ========================================================================= */
 
 options validvarname=any;   /* permite nomes de coluna com espaço/acento no import */
@@ -48,29 +47,26 @@ options validvarname=any;   /* permite nomes de coluna com espaço/acento no imp
 %let N_DF = 2562037;
 
 /* -------------------------------------------------------------------------
-   SALVAR GRÁFICOS COMO .PNG
-   Ajuste "outpath" para o caminho da pasta "imagens" dentro do seu Files
-   (Home) no SAS Studio — mesmo tipo de ajuste já feito no datafile= da
-   PROC IMPORT (o SAS Studio roda num servidor Linux, não no seu PC).
-   Baixe todos os PNGs gerados para a pasta local imagens/imagens_sas/.
+   2. CONFIGURAÇÃO DA SAÍDA GRÁFICA
+   Ajustar o caminho para a pasta de destino no SAS Studio.
+   Os arquivos PNG serão gravados no diretório indicado./.
    ------------------------------------------------------------------------- */
- %let outpath = /home/u64538097/sasuser.v94/Trabalho_amostragem/imagens; 
+%let outpath = /home/u64538097/Trabalho_amostragem/imagens; 
  
 ods listing gpath="&outpath." image_dpi=200;
 ods graphics on / width=800px height=500px imagefmt=png reset=all;
 
 /* -------------------------------------------------------------------------
-   1. IMPORTAÇÃO DA AMOSTRA
+   3. IMPORTAÇÃO DA AMOSTRA
    ------------------------------------------------------------------------- */
 proc import out=amostra_raw
-    datafile="/home/u64538097/sasuser.v94/Trabalho_amostragem/intenções_de_voto_pavilhões_v2.xlsx"
+    datafile="/home/u64538097/Trabalho_amostragem/intenções_de_voto_pavilhões_v2.xlsx"
     dbms=xlsx replace;
     getnames=yes;
 run;
 
-
 /* -------------------------------------------------------------------------
-   2. PREPARAÇÃO
+   4. PREPARAÇÃO DOS DADOS
       - renomeia colunas
       - remove linhas totalmente vazias (artefato da tabela do Excel)
       - cria identificador único
@@ -186,7 +182,7 @@ data amostra;
 run;
 
 /* -------------------------------------------------------------------------
-   2.1 VARIÁVEIS ORDENADAS (para os gráficos seguirem um critério lógico,
+   4.1 VARIÁVEIS ORDENADAS (para os gráficos seguirem um critério lógico,
        em vez da ordem alfabética padrão): Sexo e Turno em ordem fixa,
        Faixa de Renda e Faixa Etária em ordem crescente, com "Sem resposta"
        sempre na primeira posição. O FORMAT mantém o texto original visível
@@ -243,7 +239,7 @@ data amostra;
 run;
 
 /* -------------------------------------------------------------------------
-   2.2 MÉTODO: JUSTIFICATIVA DO TAMANHO DA AMOSTRA (engenharia reversa)
+   4.2 MÉTODO: JUSTIFICATIVA DO TAMANHO DA AMOSTRA (engenharia reversa)
        Dado um erro admissível, qual seria o n necessário? Usa-se a forma
        simplificada n0 = Z² * p*(1-p) / e², com Z≈2 (aprox. de 95% de
        confiança) e p=0,5 (cenário de pior caso, variância máxima):
@@ -267,8 +263,8 @@ data _null_;
 run;
 
 /* -------------------------------------------------------------------------
-   3. PERFIL DA AMOSTRA (estatísticas descritivas)
-      Os gráficos de perfil são gerados na Seção 12, via macro grafico_perfil.
+   5. PERFIL DA AMOSTRA (estatísticas descritivas)
+      Os gráficos de perfil são gerados na Seção 14, via macro grafico_perfil.
    ------------------------------------------------------------------------- */
 title "Perfil da amostra (n nominal = &n_nominal.)";
 proc freq data=amostra;
@@ -277,7 +273,7 @@ run;
 title;
   
 /* ------------------------------------------------------------------------- 
-	4.1 IDENTIFICAÇÃO E CONTAGEM DOS NÃO-RESPONDENTES TOTAIS
+	6.1 IDENTIFICAÇÃO E CONTAGEM DOS NÃO-RESPONDENTES TOTAIS
   - calcula o percentual de não-respondentes totais
 ------------------------------------------------------------------------- */
 
@@ -289,7 +285,7 @@ run;
 title;
 
 /* -------------------------------------------------------------------------
-   4.2 NÃO-RESPOSTA (item non-response)
+   6.2 NÃO-RESPOSTA (item non-response)
      Analise sobre os não respondentes.
    ------------------------------------------------------------------------- */
   
@@ -335,6 +331,9 @@ data _null_;
 
     if eof then do;
         n_resp = n_total - n_nao_resp;
+        
+        pct_nao_resp = (n_nao_resp / n_total) * 100;
+        pct_resp     = (n_resp / n_total) * 100;
 
         call symputx('n_nao_resp', n_nao_resp);
         call symputx('n_resp', n_resp);
@@ -342,14 +341,14 @@ data _null_;
 
         put "n total da amostra: " n_total;
         put "Não respondentes totais: " n_nao_resp
-            " (" (n_nao_resp/n_total*100) 6.2 "%)";
+            " (" pct_nao_resp 6.2 "%)";
         put "Respondentes totais: " n_resp
-            " (" (n_resp/n_total*100) 6.2 "%)";
+            " (" pct_resp 6.2 "%)";
     end;
 run;
 
 /* -------------------------------------------------------------------------
-   4.3 NÃO RESPOSTA ÀS PERGUNTAS DE PRESIDENTE E GOVERNADOR
+   6.3 NÃO RESPOSTA ÀS PERGUNTAS DE PRESIDENTE E GOVERNADOR
 
    Analisa exclusivamente os indivíduos classificados como "Respondente"
    na seção 2, identificando quem deixou em branco as perguntas eleitorais.
@@ -387,119 +386,279 @@ run;
 
 title;
 
+/* Contagem das respostas válidas para cada pergunta */
+proc sql noprint;
+    select count(*)
+    into :n_valid_pres trimmed
+    from amostra_respondentes
+    where not missing(presidente)
+      and upcase(compbl(strip(presidente))) ne 'SEM RESPOSTA';
+
+    select count(*)
+    into :n_valid_gov trimmed
+    from amostra_respondentes
+    where not missing(governador)
+      and upcase(compbl(strip(governador))) ne 'SEM RESPOSTA';
+quit;
+
+/* Registra os tamanhos válidos no LOG do SAS */
+%put NOTE: Respostas válidas para Presidente = &n_valid_pres.;
+%put NOTE: Respostas válidas para Governador = &n_valid_gov.;
+
 /* -------------------------------------------------------------------------
-   5. MARGEM DE ERRO: NOMINAL (n=400) x EFETIVA (descontando não-resposta)
-      Como a população é desconhecida/grande, não há correção de população
-      finita (fpc) aqui (o fpc só é formalizado via N_DF no PROC SURVEYFREQ
-      da Seção 7). Cenário de pior caso (p=0,5) para a margem de erro,
-      usando o percentil t (TINV, df=n-1) em vez de Z fixo - mesma
-      convenção adotada pelo professor em todas as aulas (aula3/4/5.sas):
+   7. MARGEM DE ERRO: NOMINAL (n=400) x EFETIVA (descontando não-resposta)
+   
+   OBJETIVO: Comparar a margem de erro esperada no planejamento da pesquisa 
+   com a margem de erro recalculada a partir do número de respostas válidas para
+   as perguntas de intenção de voto para Presidente e Governador.
+   
+   CRITÉRIOS GERAIS DE CÁLCULO
+   - Nível de confiança: 95%.
+   - Cenário de pior caso: p=0,5 (variância máxima).
+   - Valor crítico: percentil t de Student (TINV), com n-1 graus de
+     liberdade, em vez de utilizar Z fixo, conforme a convenção adotada
+     pelo professor nas aulas (aula3/4/5.sas).
+   - Sem correção de população finita (FPC) neste cálculo, considerando
+     a população como grande. A referência ao N_DF é utilizada na
+     especificação do PROC SURVEYFREQ da Seção 9.
+      
+   MARGEM DE ERRO NOMINAL: Calculada com o tamanho planejado da amostra (n=400), 
+   antes de descontar a não-resposta. Representa a precisão esperada no
+   planejamento, sob as hipóteses adotadas.
 
-           e = t(0,975; n-1) * sqrt( p*(1-p) / n )
+   MARGEM DE ERRO EFETIVA: Recalculada separadamente para Presidente e Governador, 
+   utilizandoo número de respostas válidas de cada pergunta (n_valid_pres e
+   n_valid_gov). Como esses números são inferiores a 400, a
+   margem de erro efetiva é maior que a nominal, indicando
+   perda de precisão decorrente da redução do tamanho amostral válido.
 
-      A não-resposta reduz o n efetivo de cada pergunta, o que AUMENTA
-      a margem de erro em relação ao n nominal da amostra coletada.
+   FÓRMULA UTILIZADA: e = t(0,975; n-1) * sqrt[p*(1-p)/n] 
    ------------------------------------------------------------------------- */
-data _null_;
-    p = 0.5;       /* cenário de variância máxima */
+	/* Cálculo das margens de erro nominal e efetivas */
+
+data comparacao_me;
+    length estimativa $25;
+    p = 0.5;
 
     t_nominal = tinv(0.975, &n_nominal. - 1);
-    t_pres    = tinv(0.975, &n_valid_pres. - 1);
-    t_gov     = tinv(0.975, &n_valid_gov. - 1);
+    e_nominal = t_nominal * sqrt(p*(1-p) / &n_nominal.);
 
-    e_nominal = t_nominal * sqrt( p*(1-p) / &n_nominal. );
-    e_pres    = t_pres    * sqrt( p*(1-p) / &n_valid_pres. );
-    e_gov     = t_gov     * sqrt( p*(1-p) / &n_valid_gov. );
+    estimativa = 'Nominal';
+    n = &n_nominal.;
+    margem = e_nominal;
+    output;
 
-    put "Margem de erro c/ n nominal (&n_nominal.): " e_nominal best6.;
-    put "Margem de erro efetiva - Presidente (n=&n_valid_pres.): " e_pres best6.;
-    put "Margem de erro efetiva - Governador (n=&n_valid_gov.): " e_gov best6.;
+    t_pres = tinv(0.975, &n_valid_pres. - 1);
+    e_pres = t_pres * sqrt(p*(1-p) / &n_valid_pres.);
+
+    estimativa = 'Presidente';
+    n = &n_valid_pres.;
+    margem = e_pres;
+    output;
+
+    t_gov = tinv(0.975, &n_valid_gov. - 1);
+    e_gov = t_gov * sqrt(p*(1-p) / &n_valid_gov.);
+
+    estimativa = 'Governador';
+    n = &n_valid_gov.;
+    margem = e_gov;
+    output;
+
+    keep estimativa n margem;
 run;
 
-/* -------------------------------------------------------------------------
-   6. VARIÂNCIA DAS ESTIMATIVAS (cálculo explícito pela fórmula)
-      Para cada candidato: p_hat = count/n ; Var(p_hat) = p_hat*(1-p_hat)/(n-1)
-      (estimador não-viesado de Cochran, população infinita/sem fpc - ver
-      Seção 2.2 do relatório). O IC usa o percentil t (TINV, df=n-1), não
-      Z fixo - mesma convenção do professor em aula3/4/5.sas. Serve para
-      conferir "na mão" os desvios-padrão/IC que o PROC SURVEYFREQ calcula
-      na seção 7.
-   ------------------------------------------------------------------------- */
-proc freq data=amostra noprint;
-    tables presidente / out=freq_pres (where=(not missing(presidente)));
-    tables governador / out=freq_gov  (where=(not missing(governador)));
+
+	/* Comparação entre as margens de erro */
+
+proc sql noprint;
+    select margem into :me_nominal trimmed
+    from comparacao_me
+    where estimativa = 'Nominal';
+quit;
+
+data comparacao_me;
+    set comparacao_me;
+
+    if estimativa = 'Nominal' then do;
+        diferenca_pp = 0;
+        aumento_pct = 0;
+    end;
+    else do;
+        diferenca_pp = (margem - &me_nominal.) * 100;
+        aumento_pct = (margem / &me_nominal. - 1) * 100;
+    end;
+
+    margem_pct = margem * 100;
+
+    label
+        estimativa   = 'Estimativa'
+        n            = 'N válido'
+        margem_pct   = 'Margem de erro (%)'
+        diferenca_pp = 'Diferença (p.p.)'
+        aumento_pct  = 'Aumento relativo (%)';
+
+    format margem_pct diferenca_pp aumento_pct 8.2;
 run;
 
-data var_pres;
-    set freq_pres;
-    n      = &n_valid_pres.;
-    p_hat  = count / n;
-    var_p  = p_hat*(1-p_hat) / (n-1);
-    se_p   = sqrt(var_p);
-    tcrit  = tinv(0.975, n-1);
-    ic_li  = max(0, p_hat - tcrit*se_p);
-    ic_ls  = min(1, p_hat + tcrit*se_p);
+title "Comparação da margem de erro nominal e efetiva";
+
+proc print data=comparacao_me noobs label;
+    var estimativa n margem_pct diferenca_pp aumento_pct;
 run;
 
-data var_gov;
-    set freq_gov;
-    n      = &n_valid_gov.;
-    p_hat  = count / n;
-    var_p  = p_hat*(1-p_hat) / (n-1);
-    se_p   = sqrt(var_p);
-    tcrit  = tinv(0.975, n-1);
-    ic_li  = max(0, p_hat - tcrit*se_p);
-    ic_ls  = min(1, p_hat + tcrit*se_p);
-run;
-
-title "Variância e IC calculados manualmente - Presidente";
-proc print data=var_pres noobs;
-    var presidente count p_hat var_p se_p ic_li ic_ls;
-run;
-
-title "Variância e IC calculados manualmente - Governador";
-proc print data=var_gov noobs;
-    var governador count p_hat var_p se_p ic_li ic_ls;
-run;
 title;
 
+/* =========================================================================
+   8. ESTIMAÇÃO DAS PROPORÇÕES DE INTENÇÃO DE VOTO E MEDIDAS DE INCERTEZA
+
+   OBJETIVO: Calcular, para cada candidato a Presidente e Governador,
+   as frequências, proporções, variâncias, erros-padrão, margens de erro
+   e intervalos de confiança de 95%.
+
+   Para a variância, mantém-se o estimador baseado na variância amostral
+   da variável indicadora:
+       Var(p_hat) = p_hat*(1-p_hat)/(n-1)
+
+   O intervalo de confiança utiliza o valor crítico t de Student, com n-1
+   graus de liberdade, conforme a convenção adotada nas seções anteriores.
+
+   Os denominadores n são os números de respostas válidas de cada pergunta.
+   Respostas vazias e a categoria literal "Sem resposta" são excluídas.
+   A resposta "Não sei/não quero responder" permanece como categoria válida.
+   ========================================================================= */
+
+
+	/* Frequências absolutas por candidato */
+
+proc freq data=amostra noprint;
+    tables presidente / out=freq_pres;
+    tables governador / out=freq_gov;
+run;
+
+
+	/* Consolidação das frequências e cálculo das estimativas */
+
+data me_candidatos;
+    length cargo $12 candidato $60;
+
+    set freq_pres(in=a)
+        freq_gov(in=b);
+
+    /* Identifica o cargo e o número de respostas válidas */
+
+    if a then do;
+        if missing(presidente)
+           or upcase(compbl(strip(presidente))) = 'SEM RESPOSTA'
+        then delete;
+
+        cargo = 'Presidente';
+        candidato = presidente;
+        n = &n_valid_pres.;
+    end;
+
+    else if b then do;
+        if missing(governador)
+           or upcase(compbl(strip(governador))) = 'SEM RESPOSTA'
+        then delete;
+
+        cargo = 'Governador';
+        candidato = governador;
+        n = &n_valid_gov.;
+    end;
+
+    /* Proporção estimada */
+
+    p_hat = count / n;
+    proporcao = p_hat * 100;
+
+    /* Variância e erro-padrão da proporção */
+
+    var_p = p_hat * (1-p_hat) / (n-1);
+    se_p = sqrt(var_p);
+
+    /* Margem de erro e intervalo de confiança de 95% */
+
+    tcrit = tinv(0.975, n-1);
+
+    margem_pp = tcrit * se_p * 100;
+
+    ic_inf = max(0, (p_hat - tcrit*se_p) * 100);
+    ic_sup = min(100, (p_hat + tcrit*se_p) * 100);
+
+    label
+        cargo      = 'Cargo'
+        candidato  = 'Candidato'
+        count      = 'Frequência'
+        n          = 'N válido'
+        proporcao  = 'Proporção (%)'
+        var_p      = 'Variância da proporção'
+        se_p       = 'Erro-padrão'
+        margem_pp  = 'Margem de erro (p.p.)'
+        ic_inf     = 'IC 95% - limite inferior'
+        ic_sup     = 'IC 95% - limite superior';
+
+    format
+        proporcao margem_pp ic_inf ic_sup 7.2
+        var_p 12.8
+        se_p 10.6;
+
+    keep cargo candidato count n proporcao var_p se_p
+         margem_pp ic_inf ic_sup;
+run;
+
+proc sort data=me_candidatos;
+    by cargo descending proporcao;
+run;
+
+	/* Tabela final de variância, erro-padrão e IC de 95% */
+
+title "Variância, erro-padrão e IC 95% por candidato";
+
+proc print data=me_candidatos noobs label;
+    var cargo candidato count n proporcao
+        var_p se_p margem_pp ic_inf ic_sup;
+run;
+
+title;
 /* -------------------------------------------------------------------------
-   7. ESTIMATIVAS DA INTENÇÃO DE VOTO NA POPULAÇÃO (PROC SURVEYFREQ)
-      TOTAL=&N_DF. informa ao PROC SURVEYFREQ o tamanho do eleitorado do DF
-      (fonte: TRE-DF, ver comentário da macro N_DF no início do script),
-      ativando o cálculo do fpc. Como n válido (264) é uma fração ínfima
-      de N (~0,01%), fpc≈0,99995 - na prática equivale a tratar a
-      população como infinita (mesmo resultado que se obtinha antes, sem
-      TOTAL=), mas agora o fpc é calculado explicitamente a partir de uma
-      fonte oficial, em vez de apenas presumido. Registros com
-      presidente/governador em branco são excluídos automaticamente
-      (consistente com o n_valido calculado na seção 4). Essas são as
-      tabelas formais usadas na Seção 4.3 do relatório (o gráfico de IC
-      correspondente é gerado na Seção 12, via macro grafico_ic).
-   ------------------------------------------------------------------------- */
+   9. ESTIMATIVAS DA INTENÇÃO DE VOTO NA POPULAÇÃO (PROC SURVEYFREQ)
+      
+      OBJETIVO: Estimar as proporções de intenção de voto para Presidente e 
+      Governador, apresentando as frequências, os percentuais, as variâncias 
+      e os intervalos de confiança (IC) de 95% para cada categoria de resposta.
+      
+      CORREÇÃO PARA POPULAÇÃO FINITA (FPC): Considerando N=&N_DF. e aproximadamente
+      261 respostas válidas, a fração amostral é muito pequena (cerca de 0,01%). 
+      Portanto, a correção para população finita tem efeito desprezível sobre 
+      a variância e os intervalos de confiança.
+      
+      As tabelas apresentam as estimativas de intenção de voto e seus intervalos de 
+      confiança, permitindo avaliar a incerteza associada às proporções estimadas. 
+          
+   ------------------------------------------------------------------------- */ 
 title "Estimativa da intenção de voto p/ Presidente (IC 95%)";
 proc surveyfreq data=amostra order=freq total=&N_DF.;
-    tables presidente / cl;
+    tables presidente / var cl;
 run;
 
 title "Estimativa da intenção de voto p/ Governador (IC 95%)";
 proc surveyfreq data=amostra order=freq total=&N_DF.;
-    tables governador / cl;
+    tables governador / var cl;
 run;
 title;
 
 /* =========================================================================
-   8. ANÁLISE POR SEXO, FAIXA DE RENDA, FAIXA ETÁRIA E TURNO
+   10. ANÁLISE POR SEXO, FAIXA DE RENDA, FAIXA ETÁRIA E TURNO
       Cruza a intenção de voto (Presidente/Governador) com Sexo, Faixa de
       renda, Faixa etária e Turno de coleta. O teste qui-quadrado (CHISQ)
       avalia se há associação estatisticamente significativa entre o
       perfil do respondente e o candidato escolhido. Os gráficos de barras
-      empilhadas correspondentes são gerados na Seção 12, via macro
-      grafico_empilhado (já com o agrupamento "Outros" da Seção 9).
+      empilhadas correspondentes são gerados na Seção 14, via macro
+      grafico_empilhado (já com o agrupamento "Outros" da Seção 11).
    ========================================================================= */
 
 /* -------------------------------------------------------------------------
-   8.0 PRESIDENTE/GOVERNADOR x SEXO
+   10.0 PRESIDENTE/GOVERNADOR x SEXO
    ------------------------------------------------------------------------- */
 title "Presidente x Sexo";
 proc freq data=amostra;
@@ -514,7 +673,7 @@ run;
 title;
 
 /* -------------------------------------------------------------------------
-   8.1 PRESIDENTE x Faixa de Renda / Faixa Etária / Turno
+   10.1 PRESIDENTE x Faixa de Renda / Faixa Etária / Turno
    ------------------------------------------------------------------------- */
 title "Presidente x Faixa de Renda";
 proc freq data=amostra;
@@ -535,7 +694,7 @@ run;
 title;
 
 /* -------------------------------------------------------------------------
-   8.2 GOVERNADOR x Faixa de Renda / Faixa Etária / Turno
+   10.2 GOVERNADOR x Faixa de Renda / Faixa Etária / Turno
    ------------------------------------------------------------------------- */
 title "Governador x Faixa de Renda";
 proc freq data=amostra;
@@ -556,7 +715,7 @@ run;
 title;
 
 /* =========================================================================
-   9. GRUPO "OUTROS" (candidatos com menos de 1% dos votos válidos)
+   11. GRUPO "OUTROS" (candidatos com menos de 1% dos votos válidos)
       Consolida, em cada cargo, todo candidato cuja contagem represente
       menos de 1% de n_valido - isso inclui Romeu Zema, que tem cor
       própria definida na paleta (Seção 10) mas apenas 1 voto (0,38%):
@@ -606,13 +765,13 @@ title;
 %agrupar_outros(var=governador);
 
 /* =========================================================================
-   10. PALETA DE CORES E ORDEM DA LEGENDA
+   12. PALETA DE CORES E ORDEM DA LEGENDA
        Mesma paleta validada (acessível/CVD-safe) usada nos gráficos deste
        trabalho: candidatos em ordem alfabética, depois "Outros", depois
        o bloco de situações de não-voto (Branco, Nulo, Não sei/não quero
        responder), em tons de cinza - nessa ordem na legenda dos gráficos
        empilhados (Seção 12). "Sem resposta" não aparece aqui pois nunca é
-       uma categoria de voto válida (ver Seção 9).
+       uma categoria de voto válida (ver Seção 11).
    ========================================================================= */
 data paleta_pres;
     length id $4 value $40 fillcolor $9;
@@ -661,12 +820,11 @@ run;
 
 /* Cor única dos gráficos de perfil (não envolvem candidatos) */
 %let cor_neutra = #C0CFE5;
-
 /* =========================================================================
-   11. MACROS DE GRÁFICO
+   13. MACROS DE GRÁFICO
    ========================================================================= */
 
-/* 11.1 Perfil (barras simples com % no topo) */
+/* 13.1 Perfil (barras simples com % no topo) */
 %macro grafico_perfil(ord=, titulo=, xlabel=, nome=, w=900, h=550);
 
     proc freq data=amostra noprint;
@@ -691,12 +849,19 @@ run;
 
 %mend grafico_perfil;
 
-/* 11.2 Intenção de voto com IC 95% (Cochran, divisor n-1, percentil t) */
-%macro grafico_ic(grp=, attrid=, titulo=, nome=);
+/* 13.2 Intenção de voto com IC 95% (Cochran, divisor n-1, percentil t) */
+%macro grafico_ic(grp=, attrid=, titulo=, nome=, base=respondentes);
 
-    proc freq data=amostra noprint;
-        tables &grp. / out=_ic;
-    run;
+    %if &base.=total %then %do;
+        proc freq data=amostra noprint;
+            tables &grp. / missing out=_ic;
+        run;
+    %end;
+    %else %do;
+        proc freq data=amostra(where=(not missing(&grp.))) noprint;
+            tables &grp. / out=_ic;
+        run;
+    %end;
 
     proc sql noprint;
         select sum(count) into :nic trimmed from _ic;
@@ -704,29 +869,29 @@ run;
 
     data _ic;
         set _ic;
-        n    = &nic.;
-        p    = count / n;
-        se   = sqrt(p * (1 - p) / (n - 1));
-        tcrit = tinv(0.975, n - 1);
-        me   = tcrit * se;
-        pct  = 100 * p;
-        li   = max(0,   100 * (p - me));
-        ls   = min(100, 100 * (p + me));
-        lbl  = cats(put(pct, 5.1), '%');
+        n = &nic.;
+        p = count / n;
+        se = sqrt(p * (1-p) / (n-1));
+        tcrit = tinv(0.975, n-1);
+        me = tcrit * se;
+        pct = 100 * p;
+        li = max(0, 100 * (p-me));
+        ls = min(100, 100 * (p+me));
+        lbl = cats(put(pct, 5.1), '%');
         rename &grp. = categoria;
     run;
 
     proc sort data=_ic;
-        by descending pct;      /* maior no topo do gráfico */
-    run;    
+        by descending pct;
+    run;
 
     ods graphics / reset=index imagename="&nome." width=900px height=600px;
     title1 bold "&titulo.";
-    title2 "Candidatos com menos de 1% dos votos agrupados em 'Outros'";
     proc sgplot data=_ic dattrmap=attrmap noautolegend;
         hbarparm category=categoria response=pct /
-            limitlower=li limitupper=ls group=categoria attrid=&attrid.
-            datalabel=lbl groupdisplay=cluster barwidth=0.65;
+            limitlower=li limitupper=ls group=categoria
+            attrid=&attrid. datalabel=lbl
+            groupdisplay=cluster barwidth=0.65;
         yaxis discreteorder=data display=(nolabel);
         xaxis label="Percentual (%)" min=0 grid;
     run;
@@ -734,7 +899,88 @@ run;
 
 %mend grafico_ic;
 
-/* 11.3 Barras empilhadas: % de cada voto dentro de cada categoria */
+/* 13.3 Intenção de voto com IC 95% - somente votos válidos
+   Exclui Branco, Nulo e Não sei/não quero responder.
+   O denominador passa a ser a soma dos votos dos candidatos. */
+
+%macro grafico_ic_validos(grp=, attrid=, titulo=, nome=);
+
+    /* Frequências apenas dos votos válidos */
+    proc freq data=amostra(where=(
+        not missing(&grp.)
+        and &grp. not in (
+            'Branco',
+            'Nulo',
+            'Não sei/não quero responder'
+        )
+    )) noprint;
+        tables &grp. / out=_ic_validos;
+    run;
+
+    /* Total de votos válidos */
+    proc sql noprint;
+        select sum(count)
+        into :n_validos trimmed
+        from _ic_validos;
+    quit;
+
+    /* Proporções, erro-padrão e IC de 95% */
+    data _ic_validos;
+        set _ic_validos;
+
+        n = &n_validos.;
+        p = count / n;
+
+        se = sqrt(p * (1-p) / (n-1));
+        tcrit = tinv(0.975, n-1);
+        me = tcrit * se;
+
+        pct = 100 * p;
+        li = max(0, 100 * (p - me));
+        ls = min(100, 100 * (p + me));
+
+        lbl = cats(put(pct, 5.1), '%');
+
+        rename &grp. = categoria;
+    run;
+
+    proc sort data=_ic_validos;
+        by descending pct;
+    run;
+
+    ods graphics / reset=index
+        imagename="&nome."
+        width=900px height=600px;
+
+    title1 bold "&titulo.";
+    title2 "Somente votos válidos (sem Branco, Nulo e Não sei/não quero responder)";
+
+    proc sgplot data=_ic_validos dattrmap=attrmap noautolegend;;
+        hbarparm category=categoria response=pct /
+            limitlower=li
+            limitupper=ls
+            group=categoria
+            attrid=&attrid.
+            datalabel=lbl
+            groupdisplay=cluster 
+            barwidth=0.65;
+
+        yaxis discreteorder=data
+              display=(noticks)
+              label="Candidato";
+        xaxis label="Percentual dos votos válidos (%)"
+              min=0
+              grid;
+    run;
+
+    title;
+
+    /* Registra o denominador utilizado */
+    %put NOTE: Total de votos válidos para &grp. = &n_validos.;
+
+%mend grafico_ic_validos;
+
+/* 13.4 Barras empilhadas: % de cada voto dentro de cada categoria */
 %macro grafico_empilhado(ord=, grp=, pal=, attrid=, titulo=, xlabel=, nome=);
 
     proc freq data=amostra(where=(not missing(&grp.) and not missing(&ord.))) noprint;
@@ -766,7 +1012,7 @@ run;
 %mend grafico_empilhado;
 
 /* =========================================================================
-   12. EXECUÇÃO
+   14. EXECUÇÃO
    ========================================================================= */
 
 /* Perfil */
@@ -776,10 +1022,25 @@ run;
 %grafico_perfil(ord=turno_ord,  titulo=Distribuição por Turno de Coleta,         xlabel=Turno,          nome=perfil_turno, w=700);
 
 /* Intenção de voto com IC 95% */
+/* Intenção de voto com IC 95% - somente votos válidos */
+%grafico_ic_validos(grp=presidente_grp, attrid=pres,
+                    titulo=Intenção de voto - Presidente (votos válidos) com IC 95%, nome=voto_presidente_ic_validos);
+/* Intenção de voto em Presidente: respondentes (261) */
 %grafico_ic(grp=presidente_grp, attrid=pres,
-            titulo=Intenção de voto - Presidente (%) com IC 95%, nome=voto_presidente_ic);
+            titulo=Intenção de voto - Presidente (%) com IC 95% (Respondentes), nome=voto_presidente_ic_respondentes, base=respondentes);
+/* Intenção de voto em Presidente: amostra total */
+%grafico_ic(grp=presidente_grp, attrid=pres,
+            titulo=Intenção de voto - Presidente (%) com IC 95% (Amostra Total), nome=voto_presidente_ic_total, base=total);
+            
+/* Intenção de voto com IC 95% - somente votos válidos */
+%grafico_ic_validos(grp=governador_grp, attrid=gov,
+                    titulo=Intenção de voto - Governador (votos válidos) com IC 95%, nome=voto_governador_ic_validos);           
+/* Intenção de voto em Governador: respondentes (261) */
 %grafico_ic(grp=governador_grp, attrid=gov,
-            titulo=Intenção de voto - Governador (%) com IC 95%, nome=voto_governador_ic);
+            titulo=Intenção de voto - Governador (%) com IC 95% (Respondentes), nome=voto_governador_ic_respondentes, base=respondentes);
+/* Intenção de voto em Governador: amostra total */
+%grafico_ic(grp=governador_grp, attrid=gov,
+            titulo=Intenção de voto - Governador (%) com IC 95% (Amostra Total), nome=voto_governador_ic_total, base=total);
 
 /* Cruzamentos por subgrupo - Presidente */
 %grafico_empilhado(ord=sexo_ord,   grp=presidente_grp, pal=paleta_pres, attrid=pres,
