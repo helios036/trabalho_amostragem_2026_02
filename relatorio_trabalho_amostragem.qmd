@@ -215,7 +215,7 @@ Fonte: TRE-DF (2026). *Distrito Federal ultrapassa 2,56 milhões de eleitores e 
 
 ## 3.3 Justificativa do tamanho da amostra (n = 400)
 
-EEmbora os dados já estivessem integralmente coletados, o tamanho amostral de **n = 400** pessoas pode ser justificado teoricamente com base em uma margem de erro de $e=5\%$, conforme demonstrado a seguir. Para esse cálculo, utiliza-se a fórmula clássica de determinação do tamanho amostral para estimar uma proporção populacional:
+Embora os dados já estivessem integralmente coletados, o tamanho amostral de **n = 400** pessoas pode ser justificado teoricamente com base em uma margem de erro de $e=5\%$, conforme demonstrado a seguir. Para esse cálculo, utiliza-se a fórmula clássica de determinação do tamanho amostral para estimar uma proporção populacional:
 
 $$n_0 = \frac{Z^2\,p(1-p)}{e^2} = \frac{2^2 \times 0{,}5 \times 0{,}5}{0{,}05^2} = \frac{1}{0{,}05^2} = \frac{1}{e^2} = 400$$
 
@@ -237,27 +237,32 @@ run;
 
 ## 3.4 Tratamento da não-resposta
 
-Quando um visitante era abordado e recusava participar da pesquisa ("Você quer/pode participar da pesquisa?" / "Não"), a recusa era registrada deixando a pergunta de voto **em branco(vazio)** no formulário. Por isso, as células em branco de Presidente/Governador são tratadas como não-resposta (*missing*) e excluídas do cálculo de $\hat p$ e do IC, enquanto "Não sei/não quero responder" permanece como mais uma categoria de voto válida:
+Quando um visitante era abordado e recusava participar da pesquisa ("Você quer/pode participar da pesquisa?" / "Não"), a recusa era registrada deixando em branco as quatro perguntas mais sensíveis do formulário (Faixa etária, Faixa de renda, Presidente e Governador) — diferente de uma recusa pontual a uma única pergunta. Por isso, um respondente é classificado como **não-respondente total** quando essas quatro variáveis, em conjunto, indicam consistentemente ausência de engajamento: células em branco nas quatro, ou uma combinação de células em branco com as opções "Sem resposta" (perfil) e "Não sei/não quero responder" (voto) nas quatro ao mesmo tempo. Quando essa combinação é identificada, as quatro variáveis são tratadas como não-resposta (*missing*) para esse respondente:
 
 ```sas
 data amostra;
     set amostra;
-    presidente = strip(presidente);
-    governador = strip(governador);
-    if missing(faixa_etaria) then faixa_etaria = 'Sem resposta';
-    if missing(faixa_renda)  then faixa_renda  = 'Sem resposta';
-    if presidente = 'Sem resposta' then presidente = '';
-    if governador = 'Sem resposta' then governador = '';
-run;
+    ...
+    if upcase(compbl(strip(presidente))) = 'NÃO SEI/NÃO QUERO RESPONDER' then
+        presidente = 'Não sei/não quero responder';
+    if upcase(compbl(strip(governador))) = 'NÃO SEI / NÃO QUERO RESPONDER' then
+        governador = 'Não sei/não quero responder';
 
-data amostra;
-    set amostra;
-    resp_presidente = ifc(missing(presidente), 'Nao respondeu', 'Respondeu');
-    resp_governador = ifc(missing(governador), 'Nao respondeu', 'Respondeu');
+    status_respondente = 'Respondente';
+    if faixa_etaria = 'Sem resposta' and faixa_renda = 'Sem resposta'
+       and presidente = 'Não sei/não quero responder'
+       and governador = 'Não sei/não quero responder' then status_respondente = 'Não-respondente';
+    else if missing(faixa_etaria) and missing(faixa_renda)
+       and missing(presidente) and missing(governador) then status_respondente = 'Não-respondente';
+    /* + 5 combinações adicionais de branco/"Sem resposta"/"Não sei" nas 4 variáveis */
+
+    if status_respondente = 'Não-respondente' then do;
+        faixa_etaria = ''; faixa_renda = ''; presidente = ''; governador = '';
+    end;
 run;
 ```
 
-Desta forma, verificou-se que a taxa de não-resposta é de **34,75%** (139 de 400) para Presidente e para Governador.
+Desta forma, identificaram-se **139 não-respondentes totais** (34,75% de 400) — 136 que deixaram as quatro perguntas literalmente em branco, mais 3 que responderam "Sem resposta"/"Não sei/não quero responder" nas quatro variáveis simultaneamente, um padrão de respostas interpretado como recusa de fato em se engajar com a pesquisa, e não como posicionamento genuíno sobre cada pergunta.
 
 ## 3.5 Consolidação de candidatos com menos de 1% dos votos na categoria "Outros"
 
@@ -274,7 +279,7 @@ Ressalta-se que esse agrupamento foi aplicado exclusivamente à apresentação g
 
 ## 4.1 Perfil da amostra
 
-Dos 400 respondentes, o perfil demográfico foi (as células em branco de Faixa etária e Faixa de renda foram tratadas como a opção "Sem resposta", já presente no instrumento, por isso nenhuma categoria de perfil abaixo fica com valor ausente):
+Sexo e Turno são observados para os 400 respondentes (não dependem de autodeclaração nas perguntas sensíveis, portanto nunca ficam ausentes). Já Faixa etária e Faixa de renda só são conhecidas para os 261 respondentes não classificados como não-respondentes totais (Seção 3.4) — por isso, essas duas variáveis são reportadas sobre a base de $n=261$, e não de $n=400$:
 
 | Variável       | Categoria                      | Base    | \%     |
 |----------------|---------------------------------|---------|--------|
@@ -298,7 +303,7 @@ Dos 400 respondentes, o perfil demográfico foi (as células em branco de Faixa 
 | Turno          | Tarde                          | n=400   | 16,75% |
 | Turno          | Noite                          | n=400   | 5,00%  |
 
-A amostra é equilibrada entre sexos, mas fortemente concentrada na faixa etária de 19 a 24 anos e no turno da manhã. Salientamos que este ponto foi abordado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
+A amostra é equilibrada entre sexos, mas fortemente concentrada no turno da manhã e, sobretudo, na faixa etária de 19 a 24 anos: entre os 261 respondentes com faixa etária conhecida, **75,10%** têm entre 19 e 24 anos — uma concentração bem mais acentuada do que os 49,00% que se obteria calculando sobre os 400 respondentes nominais (o que só seria correto se a idade dos 139 não-respondentes totais pudesse ser presumida igual à dos demais, hipótese que este trabalho não sustenta). Salientamos que este ponto foi abordado como uma limitação de representatividade (a amostra sistemática capturou majoritariamente um público jovem e do turno matutino, o que pode não refletir a composição etária real do eleitorado de Brasília).
 
 ![Distribuição por Sexo](imagens/imagens_sas/perfil_sexo.png){width="70%"}
 
@@ -378,13 +383,15 @@ A margem de erro para Lula passou de ±4,78 p.p. (se não houvesse não-resposta
 
 Para Leandro Grass, a margem de erro passou de ±4,88 p.p. para ±6,05 p.p. — aumento de 1,17 p.p., na mesma linha do observado para Lula e do efeito genérico (p=0,5) já reportado acima. Em ambos os casos, a redução de $n$ causada pela não-resposta de 34,75% é responsável por todo o aumento, já que a proporção $\hat p$ foi mantida idêntica entre os dois cenários.
 
-![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_sas/voto_presidente_ic_total.png){width="85%"}
+Os gráficos abaixo apresentam o intervalo de confiança de cada candidato em duas bases de cálculo: sobre a **amostra total** (n=400, em que os 139 não-respondentes aparecem implicitamente diluindo os percentuais) e sobre os **261 respondentes válidos** (base usada na tabela acima e no restante deste relatório):
 
-![Intenção de voto - Presidente (%) com IC 95%](imagens/imagens_sas/voto_presidente_ic_respondentes.png){width="85%"}
+![Intenção de voto - Presidente (%) com IC 95% — Amostra Total (n=400)](imagens/imagens_sas/voto_presidente_ic_total.png){width="85%"}
 
-![Intenção de voto - Governador (%) com IC 95%](imagens/imagens_sas/voto_governador_ic_total.png){width="85%"}
+![Intenção de voto - Presidente (%) com IC 95% — Respondentes (n=261)](imagens/imagens_sas/voto_presidente_ic_respondentes.png){width="85%"}
 
-![Intenção de voto - Governador (%) com IC 95%](imagens/imagens_sas/voto_governador_ic_respondentes.png){width="85%"}
+![Intenção de voto - Governador (%) com IC 95% — Amostra Total (n=400)](imagens/imagens_sas/voto_governador_ic_total.png){width="85%"}
+
+![Intenção de voto - Governador (%) com IC 95% — Respondentes (n=261)](imagens/imagens_sas/voto_governador_ic_respondentes.png){width="85%"}
 
 
 ## 4.4 Análise por subgrupos (Sexo, Turno, Faixa Etária, Faixa de Renda)
@@ -405,7 +412,7 @@ Os testes qui-quadrado de associação entre o candidato escolhido e cada variá
 - Sexo: resultado também diferente entre os dois cargos. Para Presidente, o teste qui-quadrado indicou associação estatisticamente significativa entre sexo e candidato escolhido (p=0,0051). Para Governador, não houve evidência de associação (p=0,4807). Como em 62% das células a contagem esperada é menor que 5 (reflexo dos candidatos minoritários terem poucos votos), o resultado de Presidente deve ser lido como indício, não como conclusão definitiva.
 - Faixa de renda: diferente do que se observava antes do tratamento da não-resposta desta versão da base, o cruzamento não é estatisticamente significativo para os dois cargos (Presidente p=0,7441; Governador p=0,4145). Ou seja, não há evidência, nesta amostra, de que a faixa de renda esteja associada ao candidato escolhido.
 - Faixa etária: continua fortemente significativa para os dois cargos (p\<0,0001), mas sofre de forte esparsidade (89%–90% das células com contagem esperada \<5), dado o grande número de categorias de candidatos combinado com faixas pouco povoadas (ex.: 35 a 39 anos tem apenas 2 respondentes no total). A leitura qualitativa dos gráficos é mais confiável que o p-valor nesse caso.
-- Turno: o resultado foi diferente entre os dois cargos. Para Governador, o teste qui-quadrado indicou diferença estatisticamente significativa na intenção de voto entre os turnos (p=0,0145). Para Presidente, não houve evidência de associação (p=0,3439). 
+- Turno: o resultado foi diferente entre os dois cargos. Para Governador, o teste qui-quadrado indicou diferença estatisticamente significativa na intenção de voto entre os turnos (p=0,0145). Para Presidente, não houve evidência de associação (p=0,3439). Importante: em ambos os cruzamentos, o próprio SAS alerta que mais de 2/3 das células têm contagem esperada menor que 5 (reflexo do turno Noite ter apenas 20 respondentes e dos candidatos minoritários terem poucas respostas) — isso torna o teste qui-quadrado estatisticamente pouco confiável nesses cruzamentos, e deve ser mencionado como limitação ao relatar esses resultados, inclusive o único que deu significativo (Governador x Turno), não como conclusão definitiva.
 
 ![Presidente por Sexo (% dentro de cada sexo)](imagens/imagens_sas/presidente_por_sexo.png){width="80%"}
 
