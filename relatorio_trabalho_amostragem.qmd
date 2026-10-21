@@ -55,17 +55,18 @@ Marcos Well Neres Silva Pereira\\
 
 # Resumo
 
+As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhões Anísio Teixeira e João Calmon, por meio de amostragem sistemática tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, e o efeito da não-resposta (34,75% de respondentes que deixaram a pergunta de voto em branco) sobre a precisão foi quantificado. O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (62,07%, IC 95%: [56,14%; 67,99%]) e Leandro Grass para Governador (56,70%, IC 95%: [50,65%; 62,76%]). A análise por subgrupos (turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto principalmente em função da faixa etária (p<0,0001 para os dois cargos); a associação com turno de coleta só foi significativa para Governador (p=0,0145), e a associação com faixa de renda não foi significativa para nenhum dos dois cargos.
 As pesquisas de opinião pública ocupam papel central nos processos democráticos, funcionando como mediadoras entre a vontade dos cidadãos e as elites políticas. Este trabalho tem como objetivo estimar a proporção de intenção de voto para os cargos de Presidente e Governador do Distrito Federal, a partir de uma amostra de 400 eleitores abordados presencialmente nos pavilhoes Anísio Teixeira e João Calmon, por meio de amostragem sistemática tratada como equivalente à Amostragem Aleatória Simples sem reposição. O tamanho de amostra (n=400) é justificado a partir da fórmula de dimensionamento amostral para uma margem de erro de 5 pontos percentuais. As estimativas pontuais, variâncias e intervalos de confiança foram obtidos via `PROC SURVEYFREQ` no software SAS, e o efeito da não-resposta (34,75% dos respondentes, classificados como não-respondentes totais pela combinação de quatro variáveis) sobre a margem de erro foi quantificado. O candidato Luiz Inácio Lula da Silva lidera a intenção de voto para Presidente (62,07%, IC 95%: \[56,14%; 67,99%\]) e Leandro Grass para Governador (56,70%, IC 95%: \[50,65%; 62,76%\]). A análise por subgrupos (sexo, turno, faixa etária e faixa de renda) indicou diferença estatisticamente significativa na intenção de voto principalmente em função da faixa etária (p\<0,0001 para os dois cargos); a associação com turno de coleta só foi significativa para Governador, a associação com sexo só foi significativa para Presidente, e a associação com faixa de renda não foi significativa para nenhum dos dois cargos.
 
 **Palavras-chave:** amostragem, amostragem sistemática, pesquisa eleitoral, intervalo de confiança, margem de erro, não-resposta.
 
 # 1. Introdução
 
-As pesquisas de opinião pública ocupam um papel central nos processos democráticos contemporâneos, funcionando como um dos principais mecanismos de mediação entre a vontade dos cidadãos e as elites políticas. Echegaray (2001) destaca que, desde os anos 1980, os levantamentos de opinião se tornaram centrais nos processos de consolidação democrática na América Latina, contribuindo para o aprimoramento da representação política e para a legitimidade dos resultados eleitorais. No entanto, o autor alerta para o risco de que esses instrumentos sejam manipulados por atores interessados em deslegitimar o próprio processo democrático. Desta forma, a condução tecnicamente rigorosa de uma pesquisa eleitoral, com um técnicas sólidas e a quantificação explícita de sua margem de erro, é condição necessária para que ela efetivamente cumpra essa função de informar o debate público.
+As pesquisas de opinião pública ocupam um papel central nos processos democráticos contemporâneos, funcionando como um dos principais mecanismos de mediação entre a vontade dos cidadãos e as elites políticas. Echegaray (2001) destaca que, desde os anos 1980, os levantamentos de opinião se tornaram centrais nos processos de consolidação democrática na América Latina, contribuindo para o aprimoramento da representação política e para a legitimidade dos resultados eleitorais. No entanto, o autor alerta para o risco de que esses instrumentos sejam manipulados por atores interessados em deslegitimar o próprio processo democrático. Desta forma, a condução tecnicamente rigorosa de uma pesquisa eleitoral, com técnicas sólidas e a quantificação explícita de sua margem de erro, é condição necessária para que ela efetivamente cumpra essa função de informar o debate público.
 
 No Brasil, esse papel das pesquisas eleitorais ganha relevância em períodos de eleição, quando a intenção de voto da população se torna uma informação disputada tanto por campanhas políticas quanto pelo eleitorado, que a utiliza para acompanhar a corrida eleitoral e formar sua própria decisão de voto. Conhecer, com um nível de confiança estatístico adequado, a proporção de apoio a cada candidato antes do pleito permite não apenas orientar estratégias de campanha, mas também fornecer à sociedade um retrato mais fidedigno do cenário eleitoral do que impressões assistemáticas ou amostras de conveniência.
 
-Em Brasília, esse cenário se expressa na disputa pelos cargos de Presidente da República e Governador do Distrito Federal, ambos decididos no mesmo pleito. Nesse contexto, conduziu-se uma pesquisa eleitoral presencial na cidade, com coleta de dados realizada junto a visitantes de pavilhões João Calmon e Anísio Teixeira, por meio de um plano amostral sistemático que buscou garantir representatividade ao longo de diferentes turnos do dia (manhã, tarde e noite).
+Em Brasília, esse cenário se expressa na disputa pelos cargos de Presidente da República e Governador do Distrito Federal, ambos decididos no mesmo pleito. Nesse contexto, conduziu-se uma pesquisa eleitoral presencial na cidade, com coleta de dados realizada junto a visitantes dos pavilhões João Calmon e Anísio Teixeira, por meio de um plano amostral sistemático que buscou garantir representatividade ao longo de diferentes turnos do dia (manhã, tarde e noite).
 
 Para tanto, foram abordadas 400 pessoas nos pavilhões Anísio Teixeira e João Calmon por meio de amostragem sistemática, com início aleatório sorteado entre a 1ª e a kª pessoa da sequência de chegada ao pavilhão. Em cada abordagem, registrou-se o sexo, a faixa etária, a faixa de renda familiar, o turno da coleta e a intenção de voto para Presidente e Governador, sendo os casos de recusa tratados como não-resposta.
 
@@ -79,6 +80,7 @@ Os objetivos específicos são:
 - justificar, por meio da fórmula de dimensionamento amostral, o tamanho de amostra (n=400) efetivamente utilizado na coleta;
 - avaliar o efeito da não-resposta sobre a precisão das estimativas, incluindo a verificação de não-resposta diferencial entre grupos;
 - verificar se há diferenças na intenção de voto entre subgrupos da amostra (turno de coleta, faixa etária e faixa de renda).
+
 
 # 2. Referencial Teórico
 
@@ -127,7 +129,7 @@ onde $Z_{\alpha/2}$ é o percentil da Normal padrão para a confiança desejada 
 
 ## 2.4 Determinação do tamanho da amostra
 
-Definida uma margem de erro tolerável $d$ e um risco $\alpha$ de que o erro real exceda $d$, isto é, $\Pr(|p-P|\geq d)=\alpha$, resolve-se para $n$ a partir da variância de $p$ (Cochran, 1977):
+Definida uma margem de erro tolerável $d$ e um risco $\alpha$ de que o erro real exceda $d$, isto é, $\Pr(\vert{}p-P\vert{}\geq d)=\alpha$, resolve-se para $n$ a partir da variância de $p$ (Cochran, 1977):
 
 $$n = \dfrac{\dfrac{Z_{\alpha/2}^2\,PQ}{d^2}}{1+\dfrac{1}{N}\left(\dfrac{Z_{\alpha/2}^2\,PQ}{d^2}-1\right)}$$
 
@@ -195,13 +197,14 @@ A coleta foi dividida em três turnos (Manhã, Tarde e Noite), sendo conduzido e
 
 ## 3.2 População de referência e correção de população finita (fpc)
 
+Salientamos que os respondentes abordados nos pavilhões não constituem uma amostra probabilística de todo o eleitorado do Distrito Federal, o tamanho desse eleitorado foi usado para **formalizar, em vez de apenas presumir**, a decisão de omitir a correção de população finita (fpc) nas estimativas de intenção de voto. Segundo o TRE-DF (julho/2026), o Distrito Federal possui $N=2.562.037$ eleitores. Com $n=261$, a fração amostral é:
 Salientamos que os respondentes abordados nos pavilhões não constituem uma amostra probabilística de todo o eleitorado do Distrito Federal, o tamanho desse eleitorado foi usado para formalizar, em vez de apenas presumir, a decisão de omitir a correção de população finita (fpc) nas estimativas de intenção de voto. Segundo o TRE-DF (julho/2026), o Distrito Federal possui $N=2.562.037$ eleitores. Com $n=261$, a fração amostral é:
 
 $$f = \frac{n}{N} \approx \frac{261}{2.562.037} \approx 0{,}0001019 \;(0{,}0102\%)$$
 
-de modo que o fator de correção $fpc=\sqrt{1-f}\approx 0{,}99995$ (um efeito numérico desprezível sobre o erro-padrão das estimativas e que não altera nenhum resultado apresentado). Esse valor de $N$ foi informado ao `PROC SURVEYFREQ` por meio da opção `TOTAL=`, confirmando explicitamente que a população pode ser tratada como efetivamente infinita para fins de variância, em vez de simplesmente assumir isso sem verificação:
+de modo que o fator de correção $fpc=\sqrt{1-f}\approx 0{,}99994$ (um efeito numérico desprezível sobre o erro-padrão das estimativas e que não altera nenhum resultado apresentado). Esse valor de $N$ foi informado ao `PROC SURVEYFREQ` por meio da opção `TOTAL=`, confirmando explicitamente que a população pode ser tratada como efetivamente infinita para fins de variância, em vez de simplesmente assumir isso sem verificação:
 
-``` sas
+```sas
 %let N_DF = 2562037;  /* TRE-DF, julho/2026 */
 
 proc surveyfreq data=amostra order=freq total=&N_DF.;
@@ -217,7 +220,7 @@ Embora os dados já estivessem integralmente coletados, o tamanho de amostra de 
 
 $$n_0 = \frac{Z^2\,p(1-p)}{e^2} = \frac{2^2 \times 0{,}5 \times 0{,}5}{0{,}05^2} = \frac{1}{0{,}05^2} = \frac{1}{e^2} = 400$$
 
-``` sas
+```sas
 data _null_;
     Z = 2;
     p = 0.5;
