@@ -93,7 +93,7 @@ O ponto inicial de cada entrevistador foi determinado a partir dos números alea
 | Karine        |                8 |
 | Marcos Well   |               10 |
 
-Para fins de **estimação da variância e do erro-padrão**, a amostragem sistemática foi tratada como equivalente à **Amostragem Aleatória Simples sem reposição (AASs)**. Essa aproximação é adequada quando a população pode ser considerada em **ordem aleatória**, isto é, quando não há evidências de periodicidade, tendência ou outro padrão sistemático associado à variável de interesse, conforme destacam Cochran (1977) e Bolfarine e Bussab (2004).
+Para fins de **estimação da variância e do erro-padrão**, a amostragem sistemática foi tratada como equivalente à **Amostragem Aleatória Simples sem reposição (AASs)**. Essa aproximação é adequada quando a população pode ser considerada em **ordem aleatória**, isto é, quando não há evidências de periodicidade, tendência ou outro padrão sistemático associado à variável de interesse, conforme destacam Cochran (1977) e Silva (2025).
 
 ## 2.1 Notação e parâmetros populacionais
 
@@ -119,7 +119,7 @@ $$var(p) = (1-f)\,\frac{p\,q}{n-1}$$
 
 ## 2.3 Erro-padrão e intervalo de confiança
 
-O erro-padrão é $EP(p)=\sqrt{Var(p)}$. Assumindo normalidade assintótica de $p$ (Bolfarine & Bussab, 2004), o intervalo de confiança aproximado de coeficiente $1-\alpha$ para $P$ é (Cochran, 1977):
+O erro-padrão é $EP(p)=\sqrt{Var(p)}$. Assumindo normalidade assintótica de $p$ (Silva, 2025), o intervalo de confiança aproximado de coeficiente $1-\alpha$ para $P$ é (Cochran, 1977):
 
 $$IC(P;\,1-\alpha) = p \pm Z_{\alpha/2}\sqrt{(1-f)\,\frac{p\,q}{n-1}}$$
 
@@ -149,7 +149,7 @@ Neste trabalho, $k=K$. Cochran (1977) mostra que a amostragem sistemática equiv
 
 $$V(\bar{y}_{sis}) = \frac{N-1}{N}S^2 - \frac{k(n-1)}{N}S^2_{wsy}$$
 
-Quando a população está em ordem aleatória, a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador usado na AAS (Bolfarine & Bussab, 2004). Desta forma, adotamos a premissa de que a ordem de chegada das pessoas ao pavilhão seja não é cíclica ou correlacionada com a intenção de voto, de modo que se trata a variância da amostra sistemática como equivalente à da AASs.
+Quando a população está em ordem aleatória, a amostragem sistemática tem precisão próxima à da AAS, e sua variância pode ser estimada pelo mesmo estimador (Silva, 2025). Desta forma, adotamos a premissa de que a ordem de chegada das pessoas ao pavilhão não é cíclica nem correlacionada com a intenção de voto, permitindo tratar a variância da amostra sistemática como equivalente à da AAS.
 
 # 3. Materiais e Métodos
 
