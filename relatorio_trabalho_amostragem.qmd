@@ -61,7 +61,7 @@ As pesquisas de opinião pública ocupam papel central nos processos democrátic
 
 # 1. Introdução
 
-As pesquisas de opinião pública ocupam um papel central nos processos democráticos contemporâneos, funcionando como um dos principais mecanismos de mediação entre a vontade dos cidadãos e as elites políticas. Echegaray (2001) destaca que, desde os anos 1980, os levantamentos de opinião se tornaram centrais nos processos de consolidação democrática na América Latina, contribuindo para o aprimoramento da representação política e para a legitimidade dos resultados eleitorais. No entanto, o autor alerta para o risco de que esses instrumentos sejam manipulados por atores interessados em deslegitimar o próprio processo democrático. Desta forma, a condução tecnicamente rigorosa de uma pesquisa eleitoral, com um técnicas sólidas e a quantificação explícita de sua margem de erro, é condição necessária para que ela efetivamente cumpra essa função de informar o debate público.
+As pesquisas eleitorais ocupam um papel de suma importancia nas democracias, funcionando como uma das principais ferramentas de mediação entre a vontade dos cidadãos e as elites políticas. Echegaray (2001) destaca que, desde os anos 1980, os levantamentos de opinião se tornaram centrais nos processos de consolidação democrática na América Latina, contribuindo para o aprimoramento da representação política e para a legitimidade dos resultados eleitorais. No entanto, o autor alerta para o risco de que esses instrumentos sejam manipulados por atores interessados em deslegitimar o próprio processo democrático. Desta forma, a condução adequada de uma pesquisa eleitoral, com um técnicas sólidas é fundamental cumpra essa função de subsidiar o debate público.
 
 No Brasil, esse papel das pesquisas eleitorais ganha relevância em períodos de eleição, quando a intenção de voto da população se torna uma informação disputada tanto por campanhas políticas quanto pelo eleitorado, que a utiliza para acompanhar a corrida eleitoral e formar sua própria decisão de voto. Conhecer, com um nível de confiança estatístico adequado, a proporção de apoio a cada candidato antes do pleito permite não apenas orientar estratégias de campanha, mas também fornecer à sociedade um retrato mais fidedigno do cenário eleitoral do que impressões assistemáticas ou amostras de conveniência.
 
@@ -362,7 +362,7 @@ A não-resposta reduziu o n efetivo de 400 para 261, o que aumentou a margem de 
 
 ### 4.3.1 Demonstração do cálculo: efeito da não-resposta na margem de erro
 
-A margem de erro acima usa o cenário de pior caso ($p=0,5$) para toda a amostra. Para tornar o efeito da não-resposta mais concreto, demonstra-se abaixo o cálculo completo para os dois candidatos mais votados, comparando o $n$ efetivamente observado (261, com a não-resposta de 34,75%) com um cenário hipotético em que a mesma proporção de votos tivesse sido obtida sobre os 400 respondentes nominais, sem nenhuma recusa:
+Para a apuração da margem de erro utilizou-se o cenário de pior caso ($p=0,5$) para toda a amostra. Para tornar o efeito da não-resposta mais concreto, demonstra-se abaixo o cálculo completo para os dois candidatos mais votados, comparando o $n$ efetivamente observado (261, com a não-resposta de 34,75%) com um cenário hipotético em que a mesma proporção de votos tivesse sido obtida sobre os 400 respondentes nominais:
 
 $$\text{var}(\hat p) = \frac{\hat p(1-\hat p)}{n-1} \qquad \text{se}(\hat p) = \sqrt{\text{var}(\hat p)} \qquad \text{margem} = t_{(0{,}975;\,n-1)} \times \text{se}(\hat p)$$
 
