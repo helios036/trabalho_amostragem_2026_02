@@ -213,7 +213,30 @@ run;
 
 Fonte: TRE-DF (2026). *Distrito Federal ultrapassa 2,56 milhões de eleitores e registra 94,4% do eleitorado apto com biometria*. Disponível em: <https://www.tre-df.jus.br/comunicacao/noticias/2026/Julho/distrito-federal-ultrapassa-2-56-milhoes-de-eleitores-e-registra-94-4-do-eleitorado-apto-com-biometria-1>.
 
-## 3.3 Justificativa do tamanho da amostra (n = 400)
+
+## 3.3 Apresentação das opções de voto por meio da roleta
+
+No momento do registro da intenção de voto, o entrevistador apresentava ao respondente uma roleta contendo os nomes dos candidatos, além das opções “Branco”, “Nulo” e “Não sei/não quero responder”. O uso desse recurso teve como objetivo padronizar a apresentação das alternativas de resposta e reduzir a influência do entrevistador sobre a escolha do participante.
+
+Além disso, a roleta permitiu que todos os candidatos fossem apresentados de maneira uniforme, inclusive aqueles menos conhecidos ou com menor intenção de voto, garantindo que todos os respondentes tivessem acesso ao conjunto completo de opções disponíveis.
+
+```{=latex}
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth,height=6.5cm,keepaspectratio]{imagens/imagens_coleta/candidatos_presidencia.jpeg}\\[2pt]
+{\small Candidatos à Presidência da República}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth,height=6.5cm,keepaspectratio]{imagens/imagens_coleta/candidatos_governador.jpeg}\\[2pt]
+{\small Candidatos ao Governo do Distrito Federal}
+\end{minipage}
+\end{center}
+```
+
+## 3.4 Justificativa do tamanho da amostra (n = 400)
 
 Embora os dados já estivessem integralmente coletados, o tamanho amostral de **n = 400** pessoas pode ser justificado teoricamente com base em uma margem de erro de $e=5\%$, conforme demonstrado a seguir. Para esse cálculo, utiliza-se a fórmula clássica de determinação do tamanho amostral para estimar uma proporção populacional:
 
@@ -235,7 +258,7 @@ data _null_;
 run;
 ```
 
-## 3.4 Tratamento da não-resposta
+## 3.5 Tratamento da não-resposta
 
 Quando um visitante era abordado e recusava participar da pesquisa ("Você quer/pode participar da pesquisa?" / "Não"), a recusa foi registrada deixando em branco as quatro perguntas mais sensíveis do formulário (Faixa etária, Faixa de renda, Presidente e Governador). Por isso, um respondente é classificado como não-respondente total quando essas quatro variáveis, em conjunto, indicam consistentemente ausência de engajamento: células em branco nas quatro, ou uma combinação de células em branco com as opções "Sem resposta" (perfil) e "Não sei/não quero responder" (voto) nas quatro ao mesmo tempo. Quando essa combinação é identificada, as quatro variáveis são tratadas como não-resposta (*missing*) para esse respondente:
 
@@ -265,7 +288,7 @@ run;
 
 Desta forma, identificaram-se 139 não-respondentes totais (34,75% de 400), ou seja, entrevistados que optaram por não responder as perguntas. Esse padrão foi classificado como recusa em participar da pesquisa, e esses casos foram excluídos das estimativas, que passam a se basear em 261 respondentes válidos (65,25%).
 
-## 3.5 Consolidação de candidatos com menos de 1% dos votos na categoria "Outros"
+## 3.6 Consolidação de candidatos com menos de 1% dos votos na categoria "Outros"
 
 Para simplificar a visualização dos resultados nos gráficos, criou-se a categoria "Outros", que reúne os candidatos cuja votação individual corresponde a menos de 1% dos votos válidos ($n=261$, após o desconto das não respostas).
 
