@@ -1,64 +1,21 @@
 /* =========================================================================
    TRABALHO DE AMOSTRAGEM
-   Base: Intenção de voto - Pavilhões (Brasília) - planilha v2
-
-   PLANO AMOSTRAL DE CAMPO: Amostragem Sistemática, com intervalo K 
-   (a cada K pessoas que passavam pelo pavilhão, 1 era abordada, com
-   início aleatório sorteado entre a 1ª e a Kª pessoa da sequência).
-   Amostra nominal: n = 400, de uma população desconhecida/grande
-   (sem correção de população finita - fpc).
-
-   Para fins de cálculo de variância/erro-padrão das estimativas, a
-   amostragem sistemática é tratada de forma equivalente à AAS - essa é
-   a prática padrão quando não há suspeita de periodicidade/tendência
-   na ordem de chegada das pessoas no pavilhão (não há motivo para
-   acreditar que a cada Kª pessoa exista um padrão sistemático de
-   intenção de voto). Essa suposição deve ser declarada no relatório.
-
-   Objetivo: estimar as proporções de intenção de voto na população,
-   com variância, margem de erro, intervalo de confiança, e avaliar
-   o efeito da não-resposta sobre a precisão das estimativas - também
-   por Sexo, além de Faixa de Renda, Faixa Etária e Turno da entrevista.
-
-   Todos os gráficos (perfil, não-resposta, IC e cruzamentos por
-   subgrupo) são gerados diretamente neste script via `PROC SGPLOT`,
-   através das macros definidas na Seção 13.
+   Fonte: Intenção de voto - Pavilhões (Brasília) - planilha v2
    ========================================================================= */
 
-options validvarname=any;   /* permite nomes de coluna com espaço/acento no import */
+options validvarname=any;
 
-%let n_nominal = 400;   /* tamanho da amostra definido para a pesquisa */
-%let K         = 5;     /* intervalo da amostragem sistemática em campo */
+%let n_nominal = 400;
+%let K         = 5;
 
-/* Tamanho do eleitorado do Distrito Federal (população de referência para
-   Presidente/Governador), conforme TRE-DF, julho/2026: "Distrito Federal
-   ultrapassa 2,56 milhões de eleitores e registra 94,4% do eleitorado
-   apto com biometria". Usado apenas para calcular explicitamente o fpc
-   (correção de população finita) no PROC SURVEYFREQ - com n válido=264 e
-   N=2.562.037, f=n/N≈0,000103 e fpc=sqrt(1-f)≈0,99995, ou seja, o efeito
-   numérico é desprezível (não altera as estimativas em casas decimais
-   relevantes). Mantém-se, portanto, a leitura de população "grande" do
-   cabeçalho deste script - este N apenas formaliza/comprova essa escolha
-   com uma fonte, não torna a amostra representativa de todo o DF (a
-   coleta não foi um sorteio probabilístico do eleitorado do DF como um
-   todo, e sim uma amostragem sistemática de visitantes de dois pavilhões
-   específicos - ver limitações no relatório).
-   Fonte: https://www.tre-df.jus.br/comunicacao/noticias/2026/Julho/distrito-federal-ultrapassa-2-56-milhoes-de-eleitores-e-registra-94-4-do-eleitorado-apto-com-biometria-1 */
+/* Fonte: TRE-DF, julho/2026 - https://www.tre-df.jus.br/comunicacao/noticias/2026/Julho/distrito-federal-ultrapassa-2-56-milhoes-de-eleitores-e-registra-94-4-do-eleitorado-apto-com-biometria-1 */
 %let N_DF = 2562037;
 
-/* -------------------------------------------------------------------------
-   2. CONFIGURAÇÃO DA SAÍDA GRÁFICA
-   Ajustar o caminho para a pasta de destino no SAS Studio.
-   Os arquivos PNG serão gravados no diretório indicado./.
-   ------------------------------------------------------------------------- */
 %let outpath = /home/u64538097/Trabalho_amostragem/imagens; 
  
 ods listing gpath="&outpath." image_dpi=200;
 ods graphics on / width=800px height=500px imagefmt=png reset=all;
 
-/* -------------------------------------------------------------------------
-   3. IMPORTAÇÃO DA AMOSTRA
-   ------------------------------------------------------------------------- */
 proc import out=amostra_raw
     datafile="/home/u64538097/Trabalho_amostragem/intenções_de_voto_pavilhões_v2.xlsx"
     dbms=xlsx replace;
@@ -66,21 +23,7 @@ proc import out=amostra_raw
 run;
 
 /* -------------------------------------------------------------------------
-   4. PREPARAÇÃO DOS DADOS
-      - renomeia colunas
-      - remove linhas totalmente vazias (artefato da tabela do Excel)
-      - cria identificador único
-      - corrige espaço em branco inicial em "Samara Martins (11)" (artefato
-        de digitação no Excel) e remove o sufixo numérico entre parênteses
-        do nome dos candidatos (ex.: "Luiz Inácio Lula da Silva (5)" ->
-        "Luiz Inácio Lula da Silva"), para os nomes ficarem exatamente como
-        aparecem nas tabelas do relatório e como entrada da paleta de cores
-        (Seção 10)
-      - v3: TRATAMENTO DE NÃO-RESPOSTA POR COMBINAÇÃO DAS 4 COLUNAS:
-        * Em todos os casos mapeados, as colunas correspondentes são convertidas 
-          para vazias ('').
-        * Ao final, quem possui as 4 colunas vazias é classificado como não-respondente.
-        * Foram encontrados 139 não-respondentes
+TRATAMENTO DOS DADOS
    ------------------------------------------------------------------------- */
 data amostra;
     set amostra_raw;
@@ -95,7 +38,7 @@ run;
 
 data amostra;
     set amostra;
-    if missing(Timestamp) then delete;   /* descarta linhas vazias (artefato) */
+    if missing(Timestamp) then delete;
     id = _n_;
 
     presidente = strip(presidente);
@@ -182,11 +125,7 @@ data amostra;
 run;
 
 /* -------------------------------------------------------------------------
-   4.1 VARIÁVEIS ORDENADAS (para os gráficos seguirem um critério lógico,
-       em vez da ordem alfabética padrão): Sexo e Turno em ordem fixa,
-       Faixa de Renda e Faixa Etária em ordem crescente, com "Sem resposta"
-       sempre na primeira posição. O FORMAT mantém o texto original visível
-       nos eixos/tabelas, só a ordenação interna (numérica) muda.
+Criação dos Gráficos
    ------------------------------------------------------------------------- */
 proc format;
     value sexofmt   1='Masculino' 2='Feminino';
@@ -239,14 +178,8 @@ data amostra;
 run;
 
 /* -------------------------------------------------------------------------
-   4.2 MÉTODO: JUSTIFICATIVA DO TAMANHO DA AMOSTRA (engenharia reversa)
-       Dado um erro admissível, qual seria o n necessário? Usa-se a forma
-       simplificada n0 = Z² * p*(1-p) / e², com Z≈2 (aprox. de 95% de
-       confiança) e p=0,5 (cenário de pior caso, variância máxima):
-
+   MÉTODO: JUSTIFICATIVA DO TAMANHO DA AMOSTRA
             n0 = 2² * 0,5*(1-0,5) / e² = 1 / e²
-
-       Com e=5%, n0 = 1/0,05² = 400 - bate exatamente com o n coletado.
    ------------------------------------------------------------------------- */
 data _null_;
     Z = 2;         /* aproximação usual para 95% de confiança */
@@ -263,8 +196,7 @@ data _null_;
 run;
 
 /* -------------------------------------------------------------------------
-   5. PERFIL DA AMOSTRA (estatísticas descritivas)
-      Os gráficos de perfil são gerados na Seção 14, via macro grafico_perfil.
+    PERFIL DA AMOSTRA (estatísticas descritivas)
    ------------------------------------------------------------------------- */
 title "Perfil da amostra (n nominal = &n_nominal.)";
 proc freq data=amostra;
@@ -285,7 +217,7 @@ run;
 title;
 
 /* -------------------------------------------------------------------------
-   6.2 NÃO-RESPOSTA (item non-response)
+   6.2 NÃO-RESPOSTA
      Analise sobre os não respondentes.
    ------------------------------------------------------------------------- */
   
@@ -349,14 +281,6 @@ run;
 
 /* -------------------------------------------------------------------------
    6.3 NÃO RESPOSTA ÀS PERGUNTAS DE PRESIDENTE E GOVERNADOR
-
-   Analisa exclusivamente os indivíduos classificados como "Respondente"
-   na seção 2, identificando quem deixou em branco as perguntas eleitorais.
-
-   - Campo vazio: não respondeu à pergunta.
-   - "Sem resposta": não respondeu à pergunta.
-   - "Não sei/não quero responder": resposta válida.
-   - Os não respondentes totais são excluídos desta análise.
    ------------------------------------------------------------------------- */
 
 data amostra_respondentes;
@@ -406,32 +330,8 @@ quit;
 %put NOTE: Respostas válidas para Governador = &n_valid_gov.;
 
 /* -------------------------------------------------------------------------
-   7. MARGEM DE ERRO: NOMINAL (n=400) x EFETIVA (descontando não-resposta)
+   MARGEM DE ERRO: NOMINAL (n=400) x EFETIVA (descontando não-resposta)
    
-   OBJETIVO: Comparar a margem de erro esperada no planejamento da pesquisa 
-   com a margem de erro recalculada a partir do número de respostas válidas para
-   as perguntas de intenção de voto para Presidente e Governador.
-   
-   CRITÉRIOS GERAIS DE CÁLCULO
-   - Nível de confiança: 95%.
-   - Cenário de pior caso: p=0,5 (variância máxima).
-   - Valor crítico: percentil t de Student (TINV), com n-1 graus de
-     liberdade, em vez de utilizar Z fixo, conforme a convenção adotada
-     pelo professor nas aulas (aula3/4/5.sas).
-   - Sem correção de população finita (FPC) neste cálculo, considerando
-     a população como grande. A referência ao N_DF é utilizada na
-     especificação do PROC SURVEYFREQ da Seção 9.
-      
-   MARGEM DE ERRO NOMINAL: Calculada com o tamanho planejado da amostra (n=400), 
-   antes de descontar a não-resposta. Representa a precisão esperada no
-   planejamento, sob as hipóteses adotadas.
-
-   MARGEM DE ERRO EFETIVA: Recalculada separadamente para Presidente e Governador, 
-   utilizandoo número de respostas válidas de cada pergunta (n_valid_pres e
-   n_valid_gov). Como esses números são inferiores a 400, a
-   margem de erro efetiva é maior que a nominal, indicando
-   perda de precisão decorrente da redução do tamanho amostral válido.
-
    FÓRMULA UTILIZADA: e = t(0,975; n-1) * sqrt[p*(1-p)/n] 
    ------------------------------------------------------------------------- */
 	/* Cálculo das margens de erro nominal e efetivas */
@@ -509,22 +409,8 @@ run;
 title;
 
 /* =========================================================================
-   8. ESTIMAÇÃO DAS PROPORÇÕES DE INTENÇÃO DE VOTO E MEDIDAS DE INCERTEZA
-
-   OBJETIVO: Calcular, para cada candidato a Presidente e Governador,
-   as frequências, proporções, variâncias, erros-padrão, margens de erro
-   e intervalos de confiança de 95%.
-
-   Para a variância, mantém-se o estimador baseado na variância amostral
-   da variável indicadora:
+   8. ESTIMAÇÃO DAS PROPORÇÕES DE INTENÇÃO DE VOTO E INTERVALO DE CONFIANÇA
        Var(p_hat) = p_hat*(1-p_hat)/(n-1)
-
-   O intervalo de confiança utiliza o valor crítico t de Student, com n-1
-   graus de liberdade, conforme a convenção adotada nas seções anteriores.
-
-   Os denominadores n são os números de respostas válidas de cada pergunta.
-   Respostas vazias e a categoria literal "Sem resposta" são excluídas.
-   A resposta "Não sei/não quero responder" permanece como categoria válida.
    ========================================================================= */
 
 
@@ -622,19 +508,7 @@ run;
 title;
 /* -------------------------------------------------------------------------
    9. ESTIMATIVAS DA INTENÇÃO DE VOTO NA POPULAÇÃO (PROC SURVEYFREQ)
-      
-      OBJETIVO: Estimar as proporções de intenção de voto para Presidente e 
-      Governador, apresentando as frequências, os percentuais, as variâncias 
-      e os intervalos de confiança (IC) de 95% para cada categoria de resposta.
-      
-      CORREÇÃO PARA POPULAÇÃO FINITA (FPC): Considerando N=&N_DF. e aproximadamente
-      261 respostas válidas, a fração amostral é muito pequena (cerca de 0,01%). 
-      Portanto, a correção para população finita tem efeito desprezível sobre 
-      a variância e os intervalos de confiança.
-      
-      As tabelas apresentam as estimativas de intenção de voto e seus intervalos de 
-      confiança, permitindo avaliar a incerteza associada às proporções estimadas. 
-          
+       
    ------------------------------------------------------------------------- */ 
 title "Estimativa da intenção de voto p/ Presidente (IC 95%)";
 proc surveyfreq data=amostra order=freq total=&N_DF.;
@@ -649,12 +523,6 @@ title;
 
 /* =========================================================================
    10. ANÁLISE POR SEXO, FAIXA DE RENDA, FAIXA ETÁRIA E TURNO
-      Cruza a intenção de voto (Presidente/Governador) com Sexo, Faixa de
-      renda, Faixa etária e Turno de coleta. O teste qui-quadrado (CHISQ)
-      avalia se há associação estatisticamente significativa entre o
-      perfil do respondente e o candidato escolhido. Os gráficos de barras
-      empilhadas correspondentes são gerados na Seção 14, via macro
-      grafico_empilhado (já com o agrupamento "Outros" da Seção 11).
    ========================================================================= */
 
 /* -------------------------------------------------------------------------
@@ -716,20 +584,6 @@ title;
 
 /* =========================================================================
    11. GRUPO "OUTROS" (candidatos com menos de 1% dos votos válidos)
-      Consolida, em cada cargo, todo candidato cuja contagem represente
-      menos de 1% de n_valido - isso inclui Romeu Zema, que tem cor
-      própria definida na paleta (Seção 10) mas apenas 1 voto (0,38%):
-      por decisão explícita, o critério de 1% é aplicado sem exceção.
-      Branco, Nulo e "Não sei/não quero responder" NUNCA entram em
-      "Outros" (não são candidatos nem indecisão a descartar - são
-      mantidos como categorias próprias em todos os gráficos e tabelas).
-      "Sem resposta" também nunca entra, pois é tratada como não-resposta
-      (missing), não como categoria de voto (Seção 2). O cálculo é
-      genérico (via macro), então se recalcula sozinho a cada nova
-      rodada, candidato por candidato, a partir das contagens observadas.
-      Esse agrupamento vale só para os GRÁFICOS (Seção 12) - as tabelas
-      (PROC SURVEYFREQ da Seção 7, PROC FREQ da Seção 8) continuam com o
-      detalhamento candidato a candidato.
    ========================================================================= */
 %macro agrupar_outros(var=);
 
@@ -766,12 +620,6 @@ title;
 
 /* =========================================================================
    12. PALETA DE CORES E ORDEM DA LEGENDA
-       Mesma paleta validada (acessível/CVD-safe) usada nos gráficos deste
-       trabalho: candidatos em ordem alfabética, depois "Outros", depois
-       o bloco de situações de não-voto (Branco, Nulo, Não sei/não quero
-       responder), em tons de cinza - nessa ordem na legenda dos gráficos
-       empilhados (Seção 12). "Sem resposta" não aparece aqui pois nunca é
-       uma categoria de voto válida (ver Seção 11).
    ========================================================================= */
 data paleta_pres;
     length id $4 value $40 fillcolor $9;
